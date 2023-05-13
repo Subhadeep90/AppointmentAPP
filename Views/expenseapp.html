@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="../public/main.css">
+</head>
+<body>
+   <nav>
+       <heading>
+        <h1>Expense Tracker</h1>
+    </heading>
+   </nav> 
+   <p>
+    <form id="form">
+        Item:<input type="text" name="Item" id="item">
+        Description:<input type="Description" name="Description" id="Description">
+        Expense:<input type="number" name="Expense" id="Expense">
+        <button type="submit"id="submit">Add Expense</button>
+    </form>
+   <ul id="ulitem">
+
+   </ul>
+</p>
+</body>
+<script>
+    const formitem=document.getElementById('form');
+    const submititem=document.getElementById('submit');
+    const ulitem=document.getElementById('ulitem')
+    submititem.addEventListener('click',createExpense)
+    
+    function createExpense(e){
+        const obj={
+        item:document.getElementById('item').value,
+        Description:document.getElementById('Description').value,
+        Expense:document.getElementById('Expense').value
+
+
+    }
+    e.preventDefault();
+    
+    axios.post("http://localhost:5000/expensesubmitted",obj)
+    .then((resolve)=>{
+    console.log(resolve.data.expensedata);
+    showOnscreen(resolve.data.expensedata)
+    
+    }).catch((error)=>{
+        console.log(error);
+    })
+   formitem.reset();
+}
+window.addEventListener('DOMContentLoaded',()=>{
+    
+       
+    axios.get("http://localhost:5000/expensesubmitted/getDetails")
+    .then((result)=>{
+        console.log(result);
+     for(var i=0;i<result.data.length;i++)
+     {
+        showOnscreen(result.data[i])
+     }
+    }).catch((error)=>{
+        console.log(error);
+    })
+
+})
+function showOnscreen(obj)
+{
+
+    let li=document.createElement('li')
+    li.append(obj.Item+"----"+obj.Description+"----"+obj.Expense);
+    let Deletebutton=document.createElement('button')
+    let EditButton=document.createElement('button')
+    Deletebutton.append(document.createTextNode('Delete'))
+    EditButton.append(document.createTextNode('Edit'))
+
+    Deletebutton.id="deletebutton";
+    EditButton.id="editbutton";
+
+    li.append(Deletebutton); 
+    li.append(EditButton); 
+
+    Deletebutton.addEventListener('click',DeleteItems)
+    function DeleteItems(e)
+    {
+        let id=obj.id;
+         console.log(id);
+        axios.delete(`http://localhost:5000/expensesubmitted/getDetails/deletedetails/${obj.id}`)
+        .then((resolve)=>console.log(resolve))
+        .catch((error)=>console.log(error));
+        let li=e.target.parentElement;
+        ulitem.removeChild(li);
+    }
+    EditButton.addEventListener('click',EditItems)
+    function EditItems(e)
+    {
+        document.getElementById('item').value=obj.Item
+        document.getElementById('Description').value=obj.Description
+        document.getElementById('Expense').value=obj.Expense
+        DeleteItems(e);
+    }
+    ulitem.append(li);
+}
+    
+    
+    </script>
+</html>
