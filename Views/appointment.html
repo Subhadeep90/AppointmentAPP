@@ -51,8 +51,6 @@ function addItems(e)
 
     e.preventDefault();
     axios.post("http://localhost:5000/submitted",obj)
-    
-
     .then((resolve)=>{
         console.log(resolve)
         showOnscreen(resolve.data.newuserdetails)}) 

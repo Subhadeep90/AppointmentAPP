@@ -1,0 +1,35 @@
+
+body{
+    background-color: rgb(241, 238, 239);
+}
+ h1{
+     text-align: center;
+     color: rgb(0, 102, 128);
+     border-style: double;
+ }
+ heading{
+     background-color: aqua;
+ }
+ nav{
+     block-size: auto;
+     border: 0em;
+     margin:auto;
+     background-color: rgb(214, 195, 223);
+ }
+ form{
+     color:black ;
+     text-align: center;
+     text-decoration-style: solid;
+ }
+ p{
+     background-color: rgb(228, 93, 93);
+ }
+ ul{
+     background-color:darkorange;
+     text-align: center;
+     box-sizing:border-box;
+     border-style:solid
+     
+ }
+ 
+
