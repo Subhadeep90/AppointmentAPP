@@ -86,6 +86,7 @@ function showOnscreen(obj)
     Deletebutton.addEventListener('click',DeleteItems)
     function DeleteItems(e)
     {
+e.preventDefault();
         let id=obj.id;
          console.log(id);
         axios.delete(`http://localhost:5000/expensesubmitted/getDetails/deletedetails/${obj.id}`)

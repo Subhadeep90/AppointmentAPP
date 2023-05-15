@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Display</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+</head>
+<body>
+<h1>Shop</h1>
+    <form>
+    Item Name:<input type="text" id="Item">
+    Description:<input type="text" id="Description">
+    Price:<input type="number" id="Price">
+    Quantity:<input type="number" id="Quantity">
+
+  <button id="button">Add Item</button>
+
+</form>  
+<ol id="olitems">
+</ol>
+<li id="li">
+
+</li>
+</body>
+<script>
+    const submitbutton=document.getElementById('button')
+    submitbutton.addEventListener('click',submitdetails)
+    function submitdetails(e)
+    {
+       e.preventDefault();
+        let obj={
+        ItemName:document.getElementById('Item').value,
+        Description:document.getElementById('Description').value,
+        Price:document.getElementById('Price').value,
+        Quantity:document.getElementById('Quantity').value
+        }
+      axios.post("http://localhost:5000/submitshopdetails",obj)
+      .then((result)=>{
+        console.log(result)
+        showOnScreen(result.data.submitteddata)
+      })
+      .catch((error)=>{
+          console.log(error)
+      })
+    }
+
+    function showOnScreen(obj)
+    {
+      const olitems=document.getElementById('olitems')
+      const li=document.createElement('li');
+      li.append(obj.ItemName,"----",obj.Description,"----",obj.Price,"----",obj.Quantity)
+      const button1=document.createElement('button')
+      const button2=document.createElement('button')
+      const button3=document.createElement('button')
+
+
+      button1.innerText="Button 1"
+      button1.onclick=(e)=>{
+        if(obj.Quantity<=0)
+       {
+        alert('Your Quantity is 0')
+       }
+      else{ 
+      li.childNodes[6].nodeValue=li.childNodes[6].nodeValue-1;
+       obj.Quantity=li.childNodes[6].nodeValue;
+       
+      }
+       
+        axios.put(`http://localhost:5000/submitshopdetails/updateid/${obj.id}`,obj)
+    
+     .then((result)=>{
+         console.log(result)
+         
+     })
+     .catch((error)=>{
+      console.log(error)
+     })
+      }
+      button2.innerText="Button 2"
+      button2.onclick=(e)=>{
+        if(obj.Quantity<=0)
+       {
+        alert('Your Quantity is 0')
+       }
+      else{ 
+      li.childNodes[6].nodeValue=li.childNodes[6].nodeValue-2;
+       obj.Quantity=li.childNodes[6].nodeValue;
+       
+      }
+        axios.put(`http://localhost:5000/submitshopdetails/updateid/${obj.id}`,obj)
+    
+     .then((result)=>{
+         console.log(result)
+         
+     })
+     .catch((error)=>{
+      console.log(error)
+     })
+    }
+      button3.innerText="Button 3"
+      button3.onclick=(e)=>{
+        if(obj.Quantity<=0)
+       {
+        alert('Your Quantity is 0')
+       }
+      else{ 
+      li.childNodes[6].nodeValue=li.childNodes[6].nodeValue-3;
+       obj.Quantity=li.childNodes[6].nodeValue;
+       
+      }
+       
+
+        axios.put(`http://localhost:5000/submitshopdetails/updateid/${obj.id}`,obj)
+    
+     .then((result)=>{
+         console.log(result)
+         
+     })
+     .catch((error)=>{
+      console.log(error)
+     })
+
+    }
+    li.append(button1,button2,button3)
+
+    olitems.append(li);
+     
+  }
+   
+     window.addEventListener('DOMContentLoaded',()=>{
+       axios.get("http://localhost:5000/submitshopdetails/getdata")
+       .then((response)=>{
+         console.log(response.data.getdata)
+         for(var i=0;i<response.data.getdata.length;i++)
+        showOnScreen(response.data.getdata[i])
+       })
+       .catch((error)=>{
+         console.log(error);
+       })
+      })
+   
+</script>
+</html>

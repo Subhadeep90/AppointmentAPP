@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sellers Account</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+</head>
+<body>
+<nav>
+    <h1>Sellers Account</h1>
+</nav>
+<p>
+   <form id="form">
+   Selling Price:<input type="number" name="Price" id="Price"> 
+   Product Name:<input type="text" name="Item" id="Item"> 
+   Category:<select name="Category" id="Category">
+       <option value="Electronic Items" id="ElectronicItems">Electronic Items</option>
+       <option value="Food Items" id="FoodItems">Food Items</option>
+       <option value="Skincare Items" id="SkincareItems">Skincare Items</option>
+   </select>
+   <button input type="submit" id="submit">Add Product</button>
+  </form>
+</p>
+<h2>Products<h2>
+<li id="Electronic">Electronic Items</li1>
+<li id="Fooditems">Food Items</li2>
+<li id="Skincare">Skincare Items</li>
+</body>
+<script>
+ const submititem=document.getElementById('submit');
+ const ElectronicItems=document.getElementById('ElectronicItems');
+ const FoodItems=document.getElementById('FoodItems');
+ const SkincareItems=document.getElementById('SkincareItems');
+ const SelectCategory=document.getElementById('Category');
+const olitem=document.getElementById('ol')
+const li1=document.getElementById('Electronic')
+const li2=document.getElementById('Fooditems')
+const li3=document.getElementById('Skincare')
+
+
+
+
+
+
+ submititem.addEventListener('click',submitdetails)
+function submitdetails(e)
+{ 
+    e.preventDefault();
+
+    const obj={
+        SellingPrice:document.getElementById('Price').value , 
+        Item:document.getElementById('Item').value,
+        Category:document.getElementById('Category').value   
+    }
+    axios.post("http://localhost:5000/submitsellerdetails",obj)
+    .then((result)=>{
+        showOnscreen(result.data.sellerdetails)
+    })
+    .catch((error)=>{
+        console.log(error)
+    })
+
+
+
+}
+
+function showOnscreen(obj){
+    if(obj.Category=="Electronic Items")
+{
+    const ol=document.createElement('ol');
+    ol.append(obj.SellingPrice,"---",obj.ProductName,"---"+obj.Category);
+    li1.append(ol);
+    const deleteItems=document.createElement('button');
+    deleteItems.innerText="Delete";
+    ol.append(deleteItems)
+    deleteItems.onclick=(e)=>{
+        const ol=e.target.parentElement;
+        li1.removeChild(ol);
+        deletedata(obj);
+
+    }
+    
+}
+
+else if(obj.Category=="Food Items")
+{
+    const ol=document.createElement('ol');
+    ol.append(obj.SellingPrice,"---",obj.ProductName,"---"+obj.Category)
+    li2.append(ol)
+    const deleteItems=document.createElement('button');
+    deleteItems.innerText="Delete"
+    ol.append(deleteItems)
+
+        deleteItems.onclick=(e)=>{
+        const ol=e.target.parentElement;
+        li2.removeChild(ol);
+        deletedata(obj);
+
+       
+    }
+        
+}
+else
+{
+    const ol=document.createElement('ol');
+    ol.append(obj.SellingPrice,"---",obj.ProductName,"---"+obj.Category)
+    li3.append(ol)
+    const deleteItems=document.createElement('button');
+    deleteItems.innerText="Delete";
+    ol.append(deleteItems)
+    deleteItems.onclick=(e)=>{
+        deletedata(obj);
+        const ol=e.target.parentElement;
+        li3.removeChild(ol);
+    }
+}
+}
+
+window.addEventListener('DOMContentLoaded',getdata)
+function getdata()
+{
+    axios.get("http://localhost:5000/submitsellerdetails/getdetails")
+    .then((result)=>{
+    for(var i=0;i<result.data.getsellerdetails.length;i++)
+    {
+        showOnscreen(result.data.getsellerdetails[i])
+    }
+    })
+    .catch((error)=>{
+        console.log(error)
+    })
+}
+function deletedata(obj)
+{
+axios.delete(`http://localhost:5000/submitsellerdetails/deleteItems/${obj.id}`)
+      .then((result)=>{
+          console.log(result)
+      }).catch((error)=>{
+          console.log(error)
+      })
+    }
+</script>
+</html>
