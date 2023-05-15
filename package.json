@@ -15,7 +15,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon shopdisplay.js"
+    "start": "nodemon todolistapp.js"
   },
   "author": "",
   "license": "ISC"
