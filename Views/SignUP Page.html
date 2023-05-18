@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign UP</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<style>
+ 
+</style>
+
+</head>
+<body>
+<form>
+Enter your name:<input type="text" id="Name"required></input></br></br>
+ Enter your email:<input type="email" id="Email"required></input></br></br>
+ Enter a strong Password:<input type="password" id="Password" required></input></br></br>
+ <button id="button">Signup</button></br>
+</form> 
+<script>
+ const button=document.getElementById('button');
+ button.addEventListener('click',submituserdetails)
+ function submituserdetails(e)
+ { obj={
+     Name:document.getElementById('Name').value,
+     Email:document.getElementById('Email').value,
+     Password:document.getElementById('Password').value
+ }
+     e.preventDefault();
+    axios.post("http://localhost:3000/user/Signup",obj)
+    .then((result)=>{
+        console.log(result);
+    })
+    .catch((error)=>{
+        console.log(error)
+    })
+ }
+</script>
+</body>
+</html>

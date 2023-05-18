@@ -1,22 +1,30 @@
 {
   "name": "appointmentapp",
   "version": "1.0.0",
-  "description": "For taking appointment",
+  "description": "",
   "main": "appoinmentapp.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon signupexpense.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Subhadeep90/AppointmentAPP.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Subhadeep90/AppointmentAPP/issues"
+  },
+  "homepage": "https://github.com/Subhadeep90/AppointmentAPP#readme",
   "dependencies": {
-    "cors": "^2.8.5",
     "nodemon": "^2.0.22"
   },
   "devDependencies": {
     "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
     "express": "^4.18.2",
     "mysql4": "^1.7.0",
-    "sequelize": "^6.31.0"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon todolistapp.js"
-  },
-  "author": "",
-  "license": "ISC"
+    "sequelize": "^6.31.1"
+  }
 }

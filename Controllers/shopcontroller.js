@@ -1,6 +1,17 @@
 const { get } = require("../Routes/shoproutes")
 const sequelize=require('../Model/shopmodel');
-
+const deletealldata=async(req,res,next)=>{
+    try{
+    const deletedata= await sequelize.destroy({where:{
+    
+    }});
+    }
+    catch(error)
+    {
+        console.log(error)
+    }
+    }
+    
 const getalldata=async(req,res,next)=>{
     try{
     const getdata= await sequelize.findAll({
@@ -52,4 +63,5 @@ const getalldata=async(req,res,next)=>{
         getalldata,
         update,
         submit,
+        deletealldata
     }

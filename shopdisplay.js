@@ -6,6 +6,7 @@ app.use(cors());
 const bodyparser=require('body-parser'); 
 const { AsyncResource } = require('async_hooks');
 app.use(bodyparser.json({extended:false}));
+const sequelize=require('./Model/shopmodel')
 const shoproutes=require('./Routes/shoproutes')
 app.use('/',shoproutes);
 

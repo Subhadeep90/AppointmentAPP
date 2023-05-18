@@ -5,30 +5,109 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To do list</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 </head>
 <body>
  <form>
   Todo Name<input type="text" id="todo" name="Todo">
   Description<input type="text" id="Description" name="Description">
   <button id="submit">Submit</button>
- </form>  
+ </form> 
+ <h1>Tasks Remainning</h1>
+  <ol id="ol">
+  </ol>
+
+  <h1>Tasks Done</h1>
+  <ol id="oldone"></ol>
 </body>
 <script>
  const submitbutton=document.getElementById('submit')
  submitbutton.addEventListener('click',submit)
- function submit()
+ const ol=document.getElementById('ol');
+ const oldone=document.getElementById('oldone');
+
+
+ 
+ 
+ function submit(e)
  {
-   obj={
-       todoitem:document.getElementById('Todo'),
-       tododescription:document.getElementById('Description')
+   e.preventDefault();
+   let obj={
+       todoitem:document.getElementById('todo').value,
+       tododescription:document.getElementById('Description').value
 
    }
-    axios.post("http://localhost:5000//submitdetails",obj)
+    axios.post("http://localhost:5000/submitdetails",obj)
     .then((result)=>{
         console.log(result)
+        showOnScreen(result.data.submitteddata)
     }).catch((error)=>{
         console.log(error)
     })
  }
+
+ function showOnScreen(obj)
+ {
+    const donebutton=document.createElement('button')
+    const deletebutton=document.createElement('button')
+     deletebutton.innerText="X";
+    donebutton.innerText="✔";
+    const li=document.createElement('li');
+   li.append(obj.Todolist+"-->"+obj.Description)
+   li.append(" "+" "+" ")
+   donebutton.onclick=(e)=>{
+    
+    tasksremainning(e,obj);
+   }
+    deletebutton.onclick=(e)=>{
+        done(e,obj)
+    }
+   li.append(donebutton);
+   li.append(deletebutton);
+
+   ol.append(li);
+ }
+ function tasksremainning(e,obj)
+ {
+   const liremoved=e.target.parentElement;
+   ol.removeChild(liremoved);
+   axios.delete(`http://localhost:5000/submitdetails/delete/${obj.id}`)
+    .then((result)=>{
+        console.log(result)
+    })
+    .catch((error)=>{
+        console.log(error)
+    })
+   const li=document.createElement('li')
+   li.append(obj.Todolist+"-->"+obj.Description)
+   oldone.append(li);
+
+ }
+ function done(e,obj)
+ {
+    const li=e.target.parentElement;
+    ol.removeChild(li);
+    axios.delete(`http://localhost:5000/submitdetails/delete/${obj.id}`)
+    .then((result)=>{
+        console.log(result)
+    })
+    .catch((error)=>{
+        console.log(error)
+    })
+ }
+ window.addEventListener('DOMContentLoaded',()=>{
+ axios.get("http://localhost:5000/submitdetails/getdata")
+ .then((result)=>{
+     console.log(result)
+for(var i=0;i<result.data.alldata.length;i++)
+{
+     showOnScreen(result.data.alldata[i])
+}
+ })
+ .catch((error)=>{
+     console.log(error)
+ })
+ })
 </script>
 </html>
