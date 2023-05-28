@@ -15,6 +15,9 @@
  h2{
      text-align: center;
  }
+ h4{
+    color:red 
+ }
 </style>
 
 </head>
@@ -31,7 +34,7 @@ Enter your name:<input type="text" id="Name"required></input></br></br>
  Enter a strong Password:<input type="password" id="Password" required></input></br></br>
  <button id="button">Signup</button></br>
 </form> 
-<li id="li"></li>
+<h4 id="h4"></h4>
 <script>
  const button=document.getElementById('button');
  button.addEventListener('click',submituserdetails)
@@ -42,11 +45,11 @@ Enter your name:<input type="text" id="Name"required></input></br></br>
      Password:document.getElementById('Password').value
  }
      e.preventDefault();
+     const h4=document.getElementById('h4');
     axios.post("http://localhost:3000/user/Signup",obj)
     .then((result)=>{
         console.log(result);
-        document.getElementById('li')
-        li.append(result.data)
+        h4.append(result.data)
     })
     .catch((error)=>{
         console.log(error)

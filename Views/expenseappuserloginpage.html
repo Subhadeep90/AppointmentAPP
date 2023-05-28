@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login Page</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <style>
+    form{
+        text-align: center;
+        color:blue  
+    }
+    /* a{
+        text-align: center;
+        color:blueviolet 
+    } */
+</style> 
+
+</head>
+
+<body>
+ <form id="formitem">
+ Email:<input type="email" id="email" required></br></br>
+ Password:<input type="password" id="password" required></br></br>
+ <button id="Login">Log in</button></br></br>
+ <a href="file:///E:/sharpener/Node%20js/AppointmentAPP/Views/SignUP%20Page.html">New user sign Up now</a>
+
+</form> 
+
+</body>
+<script>
+const loginButton=document.getElementById('Login');
+
+
+let postrequest=(e)=>
+
+{
+    const obj={
+    Email:document.getElementById('email').value,
+    Password:document.getElementById('password').value
+
+}
+    e.preventDefault();
+    axios.post("http://localhost:3000/user/Login",obj)
+    .then((result)=>{
+    alert("Submitted Successfully")
+    })
+    .catch((error)=>{
+    alert("something is wrong")
+    })
+}
+loginButton.addEventListener('click',postrequest)
+
+</script>
+</html>

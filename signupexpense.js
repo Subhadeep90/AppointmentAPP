@@ -7,7 +7,9 @@ const bodyparser=require('body-parser');
 const { AsyncResource } = require('async_hooks');
 const sequelize=require('./Model/expenselogin')
 app.use(bodyparser.json({extended:false}));
-
+app.use('/user/Login',async(req,res)=>{
+res.sendStatus(200);
+})
 
 app.use('/user/Signup',async(req,res)=>{
 try{
