@@ -34,7 +34,6 @@ Enter your name:<input type="text" id="Name"required></input></br></br>
  Enter a strong Password:<input type="password" id="Password" required></input></br></br>
  <button id="button">Signup</button></br>
 </form> 
-<h4 id="h4"></h4>
 <script>
  const button=document.getElementById('button');
  button.addEventListener('click',submituserdetails)
@@ -49,11 +48,25 @@ Enter your name:<input type="text" id="Name"required></input></br></br>
     axios.post("http://localhost:3000/user/Signup",obj)
     .then((result)=>{
         console.log(result);
+        const h4=document.createElement('h4')
         h4.append(result.data)
+        setTimeout(()=>{
+         h4.remove()  
+        },2000)
+        document.body.append(h4);
+
     })
     .catch((error)=>{
-        console.log(error)
+        const h4=document.createElement('h4')
+
+        h4.append(error.response.data.message)
+        setTimeout(()=>{
+         h4.remove()  
+        },2000)
+        document.body.append(h4);
+
     })
+ 
  }
 </script>
 </body>

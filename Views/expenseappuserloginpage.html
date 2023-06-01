@@ -16,6 +16,9 @@
         text-align: center;
         color:blueviolet 
     } */
+    h4{
+        color:red
+    }
 </style> 
 
 </head>
@@ -28,7 +31,7 @@
  <a href="file:///E:/sharpener/Node%20js/AppointmentAPP/Views/SignUP%20Page.html">New user sign Up now</a>
 
 </form> 
-
+</br>
 </body>
 <script>
 const loginButton=document.getElementById('Login');
@@ -45,10 +48,20 @@ let postrequest=(e)=>
     e.preventDefault();
     axios.post("http://localhost:3000/user/Login",obj)
     .then((result)=>{
-    alert("Submitted Successfully")
+    if(result.status==200)
+    {
+    alert(result.data.message)
+    }
+    
     })
     .catch((error)=>{
-    alert("something is wrong")
+    const h4=document.createElement('h4')
+    h4.append(error.response.data.message);
+    setTimeout(() => {
+   h4.remove()    
+}, 2000);
+document.body.append(h4)
+
     })
 }
 loginButton.addEventListener('click',postrequest)
