@@ -6,10 +6,53 @@ app.use(cors());
 const bodyparser=require('body-parser'); 
 const { AsyncResource } = require('async_hooks');
 const sequelize=require('./Model/expenselogin');
+const userexpense=require('./Model/expenseuser');
+
 const bcrypt=require('bcrypt')
 const { where } = require('sequelize');
 app.use(bodyparser.json({extended:false}));
-app.use('/user/Login',async(req,res)=>{
+app.delete('/user/expense/deleteexpense/:id',(req,res)=>{
+    console.log(req.params.id)
+    userexpense.destroy({where:{
+        id:req.params.id
+
+    }
+    })
+    .then((result)=>{
+        console.log(result)
+    })
+    .catch((error)=>{
+        console.log(error)
+    })
+})
+app.get('/user/expense/getexpense',(req,res)=>{
+ userexpense.findAll()
+ .then((result)=>{
+     res.status(200).json({result})
+ })
+ .catch((error)=>{
+     console.log(error)
+ })
+})
+
+
+app.post('/user/expense/addexpense',(req,res)=>{
+console.log(req.body)
+userexpense.create({
+    Expenditure:req.body.Expenditure,
+    Description:req.body.Description,
+    Category:req.body.Category,
+
+})
+.then((result)=>{
+    res.status(200).json({result})
+})
+.catch((error)=>{
+    console.log(error)
+})
+})
+
+app.post('/user/Login',async(req,res)=>{
 console.log(req.body)
 const Emailid=req.body.Email;
 const UserPassword=req.body.Password;
@@ -31,8 +74,10 @@ if(user.length>0)
         }
         if(result===true)
         {
+
         res.status(200).json({message:"User logged in sucessful"})
-        }
+        
+    }
     
     
 
@@ -77,13 +122,18 @@ try{
 
 catch(error){
 console.log(error)
-res.send('User Already Exists') 
+res.send('User Already Exists')
 }
 }
 })
 sequelize.sync().then((result)=>{
-    app.listen(3000)
-}).then((error)=>{
+    userexpense.sync().then((result)=>{
+        app.listen(3000)
+
+    }).catch((error)=>{
+        console.log(error)
+    });
+}).catch((error)=>{
     console.log(error)
 });
 

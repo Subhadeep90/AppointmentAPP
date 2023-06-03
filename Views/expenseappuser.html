@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Expense</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+</head>
+<body>
+<form>
+ Choose Expenditure:<input type="number" id="amount">
+ Choose Description:<input type="text" id="Description">
+ Choose a Category:<select id="category">
+     <option>Fuel</option>
+     <option>Food</option>
+     <option>Electricity</option>
+     <option>Movie</option>
+ </select>
+ <button type="submit" id="submitbutton">Add Expense</button>
+</form>
+<ul id="ListOftems"></ul>
+</body>
+<script>
+ const submitbutton=document.getElementById('submitbutton')
+ submitbutton.addEventListener('click',additems)
+ function additems(e)
+ {
+     e.preventDefault()
+    const obj={
+      Expenditure:document.getElementById('amount').value,
+      Description:document.getElementById('Description').value,
+      Category:document.getElementById('category').value
+     }
+     axios.post("http://localhost:3000/user/expense/addexpense",obj)
+     .then((result)=>{
+       showOnscreen(result.data.result)
+
+     })
+     .catch((error)=>{
+         console.log(error)
+     })
+ }
+ function showOnscreen(obj)
+ {
+   const ListOftems=document.getElementById('ListOftems')
+   const li=document.createElement('li')
+   li.append(obj.Expenditure,"----",obj.Description,"----",obj.Category)
+   const deletebutton=document.createElement('button')
+   deletebutton.innerText="Delete"; 
+   deletebutton.onclick=(e)=>{
+   deleteitems(obj)
+   const litoremove=e.target.parentElement
+   ListOftems.removeChild(litoremove);
+   }
+   
+   li.append(deletebutton);
+   ListOftems.append(li);
+ }
+ window.addEventListener('DOMContentLoaded',fetchDetails)
+ function fetchDetails()
+ {
+     axios.get("http://localhost:3000/user/expense/getexpense")
+     .then((result)=>{
+         for(var i=0;i<result.data.result.length;i++)
+         {
+             showOnscreen(result.data.result[i])
+         }
+     })
+     .catch((error)=>{
+         console.log(error)
+     })
+ }
+
+ function deleteitems(obj)
+ {
+     axios.delete(`http://localhost:3000/user/expense/deleteexpense/${obj.id}`)
+     .then((result)=>{
+      console.log(result)
+ })
+ .catch((error)=>{
+     console.log(error)
+ })
+     
+ }
+</script>
+</html>

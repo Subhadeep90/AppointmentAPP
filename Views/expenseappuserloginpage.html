@@ -35,6 +35,8 @@
 </body>
 <script>
 const loginButton=document.getElementById('Login');
+const formitem=document.getElementById('formitem');
+
 
 
 let postrequest=(e)=>
@@ -51,7 +53,8 @@ let postrequest=(e)=>
     if(result.status==200)
     {
     alert(result.data.message)
-    }
+    window.location.href="file:///E:/sharpener/Node%20js/AppointmentAPP/Views/expenseappuser.html"
+   }
     
     })
     .catch((error)=>{
