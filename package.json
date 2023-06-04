@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Subhadeep90/AppointmentAPP#readme",
   "dependencies": {
     "bcrypt": "^5.1.0",
+    "jsonwebtoken": "^9.0.0",
     "nodemon": "^2.0.22"
   },
   "devDependencies": {

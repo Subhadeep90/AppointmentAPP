@@ -52,7 +52,9 @@ let postrequest=(e)=>
     .then((result)=>{
     if(result.status==200)
     {
+    console.log(result)
     alert(result.data.message)
+    localStorage.setItem('token',result.data.token)
     window.location.href="file:///E:/sharpener/Node%20js/AppointmentAPP/Views/expenseappuser.html"
    }
     

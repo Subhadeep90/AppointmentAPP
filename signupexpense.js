@@ -7,26 +7,38 @@ const bodyparser=require('body-parser');
 const { AsyncResource } = require('async_hooks');
 const sequelize=require('./Model/expenselogin');
 const userexpense=require('./Model/expenseuser');
+const userauthentication=require('./middleware/auth')
 
 const bcrypt=require('bcrypt')
+const jwt= require('jsonwebtoken')
 const { where } = require('sequelize');
+const { generateKeyPair } = require('crypto');
 app.use(bodyparser.json({extended:false}));
-app.delete('/user/expense/deleteexpense/:id',(req,res)=>{
-    console.log(req.params.id)
+app.delete('/user/expense/deleteexpense/:id',userauthentication,(req,res)=>{
+    
     userexpense.destroy({where:{
+        ExpenseuserdetailId:req.user.id,
         id:req.params.id
 
     }
     })
     .then((result)=>{
         console.log(result)
+        if(result==0)
+        {
+            res.status(400).json({message:"User Authentication failed"})
+        }
     })
     .catch((error)=>{
-        console.log(error)
+     console.log(error)
     })
 })
-app.get('/user/expense/getexpense',(req,res)=>{
- userexpense.findAll()
+app.get('/user/expense/getexpense',userauthentication,(req,res)=>{
+ userexpense.findAll({
+     where:{
+        ExpenseuserdetailId:req.user.id  
+     }
+ })
  .then((result)=>{
      res.status(200).json({result})
  })
@@ -36,12 +48,13 @@ app.get('/user/expense/getexpense',(req,res)=>{
 })
 
 
-app.post('/user/expense/addexpense',(req,res)=>{
+app.post('/user/expense/addexpense',userauthentication,(req,res)=>{
 console.log(req.body)
 userexpense.create({
     Expenditure:req.body.Expenditure,
     Description:req.body.Description,
     Category:req.body.Category,
+    ExpenseuserdetailId:req.user.id
 
 })
 .then((result)=>{
@@ -51,7 +64,10 @@ userexpense.create({
     console.log(error)
 })
 })
-
+function generateAccessToken(id)
+{
+    return jwt.sign({userid:id},'98ABCD45677')
+}
 app.post('/user/Login',async(req,res)=>{
 console.log(req.body)
 const Emailid=req.body.Email;
@@ -64,7 +80,7 @@ else{
     try{
        const user=await sequelize.findAll({
     where:{Email:Emailid}})
-
+    
 if(user.length>0)
 {
     bcrypt.compare(UserPassword,user[0].Password,(err,result)=>{
@@ -75,7 +91,7 @@ if(user.length>0)
         if(result===true)
         {
 
-        res.status(200).json({message:"User logged in sucessful"})
+        res.status(200).json({Name:user[0].Name,message:"User logged in sucessful",token:generateAccessToken(user[0].id)})
         
     }
     
@@ -126,6 +142,11 @@ res.send('User Already Exists')
 }
 }
 })
+
+sequelize.hasMany(userexpense);
+userexpense.belongsTo(sequelize)
+
+
 sequelize.sync().then((result)=>{
     userexpense.sync().then((result)=>{
         app.listen(3000)
