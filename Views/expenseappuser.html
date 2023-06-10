@@ -26,7 +26,11 @@ h4{
  <button type="submit" id="submitbutton">Add Expense</button>
 </form>
 <ul id="ListOftems"></ul>
+<button type="submit"id="razorpay">Buy Premium Membership</ul>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <h4 id="h4"></h4>
+
+
 </body>
 <script>
  const submitbutton=document.getElementById('submitbutton')
@@ -69,11 +73,11 @@ h4{
  function fetchDetails()
  {
      const token=localStorage.getItem('token')
-     console.log(token)
     axios.get("http://localhost:3000/user/expense/getexpense",{headers:{"Authentication":token}})
      .then((result)=>{
          for(var i=0;i<result.data.result.length;i++)
-         {
+         {   
+
              showOnscreen(result.data.result[i])
          }
      })
@@ -98,6 +102,51 @@ h4{
      },2000)
  })
      
+ }
+ const razorpay=document.getElementById('razorpay')
+ razorpay.addEventListener('click',buypremium)
+ function buypremium(e)
+ {
+    e.preventDefault()
+    const token=localStorage.getItem('token') 
+    axios.get("http://localhost:3000/user/buypremium",{headers:{"Authentication":token}})
+    .then((result)=>{
+        let options={
+            "key":result.data.key_id,
+            "order_id":result.data.order.id,
+            "handler":async function(result)
+            {
+                alert('You are a Premium User Now');
+                await axios.post("http://localhost:3000/purchase/updatetransactionstatus",{
+                order_id:options.order_id,
+                payment_id:result.razorpay_payment_id,
+                },{headers:{"Authorization":token}})
+
+            },
+
+        };
+        const razorpay=new Razorpay(options);
+        razorpay.open();
+        
+        razorpay.on('payment.failed',function(result){
+            console.log(result.error)
+            axios.post("http://localhost:3000/purchase/updatetransactionstatus",{
+                order_id:result.error.metadata.order_id,
+                payment_id:result.error.metadata.payment_id,
+                error:result.error.reason,
+            },{
+                headers:{"Authorization":token}
+            
+            })
+            alert('Something went wrong')
+            
+    }
+        ) 
+        
+    })
+    .catch((error)=>{
+        console.log(error)
+    })
  }
 </script>
 </html>

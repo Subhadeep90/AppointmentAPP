@@ -19,7 +19,8 @@ const expenseuserdetails=sequelize.define('Expenseuserdetails',{
        Password:{
         type:Sequelize.STRING,
         allowNull:false,
-       }
+       },
+       ispremiumuser:Sequelize.BOOLEAN
     });
  module.exports=expenseuserdetails;
   
