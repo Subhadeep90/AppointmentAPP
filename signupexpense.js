@@ -16,7 +16,12 @@ const bcrypt=require('bcrypt')
 const jwt= require('jsonwebtoken')
 const { where } = require('sequelize');
 const { generateKeyPair } = require('crypto');
+function generateAccessToken(id,ispremiumuser)
+{
+    return jwt.sign({userid:id,ispremiumuser},process.env.Token_key)
+}
 app.use(bodyparser.json({extended:false}));
+
 
 app.delete('/user/expense/deleteexpense/:id',userauthentication,(req,res)=>{
     
@@ -68,10 +73,7 @@ userexpense.create({
     console.log(error)
 })
 })
-function generateAccessToken(id)
-{
-    return jwt.sign({userid:id},process.env.Token_key)
-}
+
 app.get('/user/buypremium',userauthentication,async(req,res)=>{
 try{
 const razorpay=new Razorpay({
@@ -125,8 +127,7 @@ if(user.length>0)
         }
         if(result===true)
         {
-
-        res.status(200).json({Name:user[0].Name,message:"User logged in sucessful",token:generateAccessToken(user[0].id)})
+        res.status(200).json({Name:user[0].Name,message:"User logged in sucessful",token:generateAccessToken(user[0].id,user[0].ispremiumuser)})
         
     }
     
@@ -211,7 +212,7 @@ app.post('/purchase/updatetransactionstatus',async(req,res)=>{
             ispremiumuser:true
         })
      Promise.all([promise1,promise2])
-
+     res.status(200).json({message:'Successful',token:generateAccessToken(promise1.ExpenseuserdetailId,true)})
 }
 } 
 catch(error){
@@ -219,8 +220,37 @@ catch(error){
         }
 
     })   
+app.get('/premiumuser/leaderboard',async(req,res)=>{
+    try{
+    const expenses =await userexpense.findAll()
+    const user=await sequelize.findAll()
+    let totalexpense={};
+    expenses.forEach((expense)=>{
+    if(totalexpense[expense.ExpenseuserdetailId])
+    {
+        totalexpense[expense.ExpenseuserdetailId]=totalexpense[expense.ExpenseuserdetailId] + expense.Expenditure
+    }
+    else{
+        totalexpense[expense.ExpenseuserdetailId]=expense.Expenditure
 
+    }
 
+    })
+    var userleaderboarddetails=[];
+    user.forEach((users)=>{
+     userleaderboarddetails.push({name:users.Name,totalcost:totalexpense[users.id]||0})
+    })
+    userleaderboarddetails.sort((a,b)=>{
+    return b.totalcost-a.totalcost
+    })
+    res.status(200).json(userleaderboarddetails)
+
+}
+catch(error)
+{
+    console.log(error)
+}
+})
 
 sequelize.hasMany(userexpense)
 userexpense.belongsTo(sequelize)

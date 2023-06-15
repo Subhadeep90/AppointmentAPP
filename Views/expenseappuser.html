@@ -25,10 +25,14 @@ h4{
  </select>
  <button type="submit" id="submitbutton">Add Expense</button>
 </form>
+<h3>Expenses</h3>
 <ul id="ListOftems"></ul>
 <button type="submit"id="razorpay">Buy Premium Membership</ul>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <h4 id="h4"></h4>
+
+
+<h3 id="h3"></h3>
 
 
 </body>
@@ -69,10 +73,27 @@ h4{
    li.append(deletebutton);
    ListOftems.append(li);
  }
+ function parseJwt (token) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
+ 
+ 
  window.addEventListener('DOMContentLoaded',fetchDetails)
  function fetchDetails()
  {
      const token=localStorage.getItem('token')
+     const decodedToken=parseJwt(token);
+     if(decodedToken.ispremiumuser==true)
+     {
+        showpremiumuser()
+     }
     axios.get("http://localhost:3000/user/expense/getexpense",{headers:{"Authentication":token}})
      .then((result)=>{
          for(var i=0;i<result.data.result.length;i++)
@@ -84,7 +105,9 @@ h4{
      .catch((error)=>{
          console.log(error)
      })
- }
+     
+    }
+
 
  function deleteitems(obj)
  {
@@ -103,6 +126,61 @@ h4{
  })
      
  }
+ function showpremiumuser()
+ {
+ const razorpay=document.getElementById('razorpay')
+                razorpay.remove();
+                const h3=document.createElement('h3');
+                h3.innerText="You are a premium user now"
+                const button=document.createElement('button');
+                button.innerText="Show Leaderboard"
+                button.onclick=(e)=>{
+                    showleaderboard(e)
+                }
+                h3.append(" ",button)
+                document.body.append(h3)
+
+ }
+ function showleaderboard(e)
+ {
+    e.preventDefault() 
+    axios.get("http://localhost:3000/premiumuser/leaderboard")
+    .then((result)=>{
+        console.log(result)
+        const h3=document.createElement('h3')
+        h3.innerText="Leaderboard"
+        for (var i=0 ;i<result.data.length;i++)   
+        {
+            const li=document.createElement('li')
+            li.append("Name:",result.data[i].name,"-------","TotalExpense:",result.data[i].totalcost)
+            h3.appendChild(li)    
+
+        }
+
+        document.body.append(h3)
+    }).catch((err)=>{
+        console.log(err)
+    })
+ }
+//  function showalluserexpenses(obj)
+//  {
+//    const array=Object.values(obj.Expenditure)
+//    console.log(array)
+//     for(var i=0;i<obj.length;i++)
+//    {
+//         console.log(obj[i].Expenditure)
+//          if(obj[i].Expenditure>obj[i+1].Expenditure)
+//          {
+//              var temp=obj[i].Expenditure
+//              obj[i].Expenditure.value=obj[i+1].Expenditure
+//              obj[i].Expenditure=temp
+//          }
+//         }
+//         console.log(obj)
+
+//     }
+
+
  const razorpay=document.getElementById('razorpay')
  razorpay.addEventListener('click',buypremium)
  function buypremium(e)
@@ -111,17 +189,22 @@ h4{
     const token=localStorage.getItem('token') 
     axios.get("http://localhost:3000/user/buypremium",{headers:{"Authentication":token}})
     .then((result)=>{
+        console.log(result);
         let options={
             "key":result.data.key_id,
             "order_id":result.data.order.id,
             "handler":async function(result)
             {
+                
                 alert('You are a Premium User Now');
+                showpremiumuser()
                 await axios.post("http://localhost:3000/purchase/updatetransactionstatus",{
                 order_id:options.order_id,
                 payment_id:result.razorpay_payment_id,
-                },{headers:{"Authorization":token}})
-
+                },{headers:{"Authorization":token}}).then((result)=>{
+                 localStorage.setItem('token',result.data.token)
+                })
+                
             },
 
         };
@@ -133,6 +216,7 @@ h4{
             axios.post("http://localhost:3000/purchase/updatetransactionstatus",{
                 order_id:result.error.metadata.order_id,
                 payment_id:result.error.metadata.payment_id,
+                
                 error:result.error.reason,
             },{
                 headers:{"Authorization":token}
@@ -141,7 +225,7 @@ h4{
             alert('Something went wrong')
             
     }
-        ) 
+        )
         
     })
     .catch((error)=>{
