@@ -6,16 +6,18 @@ const path=require('path');
 app.use(cors());
 const bodyparser=require('body-parser'); 
 const { AsyncResource } = require('async_hooks');
-const sequelize=require('./Model/expenselogin');
+const expenseuserdetails=require('./Model/expenselogin');
 const userexpense=require('./Model/expenseuser');
 const ordercreated=require('./Model/order');
 
 const userauthentication=require('./middleware/auth')
 const Razorpay=require('razorpay')
 const bcrypt=require('bcrypt')
-const jwt= require('jsonwebtoken')
-const { where } = require('sequelize');
-const { generateKeyPair } = require('crypto');
+const jwt= require('jsonwebtoken');
+const sequelize = require('./util/database');
+//const { where, expenseuserdetails } = require('expenseuserdetails');
+//const { generateKeyPair } = require('crypto');
+//const { expenseuserdetailsMethod } = require('expenseuserdetails/types/utils');
 function generateAccessToken(id,ispremiumuser)
 {
     return jwt.sign({userid:id,ispremiumuser},process.env.Token_key)
@@ -115,7 +117,7 @@ res.status(400).json({message:"Email or Password is missing"})
 }
 else{
     try{
-       const user=await sequelize.findAll({
+       const user=await expenseuserdetails.findAll({
     where:{Email:Emailid}})
     
 if(user.length>0)
@@ -161,7 +163,7 @@ try{
     const saltrounds=10;
     bcrypt.hash(Passwordtaken,saltrounds,async(error,hash)=>{
         console.log(error)
-        await sequelize.create({
+        await expenseuserdetails.create({
             Name:req.body.Name,
             Email:req.body.Email,
             Password:hash
@@ -203,7 +205,7 @@ app.post('/purchase/updatetransactionstatus',async(req,res)=>{
         
         status:'Successful'
     })
-      const promise2 = await sequelize.findOne({
+      const promise2 = await expenseuserdetails.findOne({
            where:{
                id:promise1.ExpenseuserdetailId
            }
@@ -222,28 +224,20 @@ catch(error){
     })   
 app.get('/premiumuser/leaderboard',async(req,res)=>{
     try{
-    const expenses =await userexpense.findAll()
-    const user=await sequelize.findAll()
-    let totalexpense={};
-    expenses.forEach((expense)=>{
-    if(totalexpense[expense.ExpenseuserdetailId])
-    {
-        totalexpense[expense.ExpenseuserdetailId]=totalexpense[expense.ExpenseuserdetailId] + expense.Expenditure
-    }
-    else{
-        totalexpense[expense.ExpenseuserdetailId]=expense.Expenditure
 
-    }
+    const leaderboardusers=await expenseuserdetails.findAll({
+        attributes:['Name','id',[sequelize.fn('SUM',sequelize.col('userexpenses.Expenditure')),'totalcost']],
+        include:[
+            {
+             model:userexpense,
+             attributes:[]
+            }
+        ],
+        group:['expenseuserdetails.id'],
+        order:[['totalcost','DESC']]
+    })
 
-    })
-    var userleaderboarddetails=[];
-    user.forEach((users)=>{
-     userleaderboarddetails.push({name:users.Name,totalcost:totalexpense[users.id]||0})
-    })
-    userleaderboarddetails.sort((a,b)=>{
-    return b.totalcost-a.totalcost
-    })
-    res.status(200).json(userleaderboarddetails)
+    res.status(200).json(leaderboardusers)
 
 }
 catch(error)
@@ -252,13 +246,13 @@ catch(error)
 }
 })
 
-sequelize.hasMany(userexpense)
-userexpense.belongsTo(sequelize)
-sequelize.hasMany(ordercreated)
-ordercreated.belongsTo(sequelize)
+expenseuserdetails.hasMany(userexpense)
+userexpense.belongsTo(expenseuserdetails)
+expenseuserdetails.hasMany(ordercreated)
+ordercreated.belongsTo(expenseuserdetails)
 
 
-sequelize.sync().then((result)=>{
+expenseuserdetails.sync().then((result)=>{
     userexpense.sync().then((result)=>{
          ordercreated.sync().then((result)=>{
            app.listen(3000);
