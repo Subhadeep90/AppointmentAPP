@@ -60,21 +60,49 @@ app.get('/user/expense/getexpense',userauthentication,(req,res)=>{
 
 
 app.post('/user/expense/addexpense',userauthentication,(req,res)=>{
-console.log(req.body)
-userexpense.create({
+
+    const expense=userexpense.create({
     Expenditure:req.body.Expenditure,
     Description:req.body.Description,
     Category:req.body.Category,
     ExpenseuserdetailId:req.user.id
 
+}).then((result)=>{
+  expenseuserdetails.findAll({
+      where:{
+          id:req.user.id
+      }
+  }).then((resolve)=>{
+      const totalExpenses=Number(resolve[0].dataValues.TotalExpense) +Number(req.body.Expenditure)
+      console.log(totalExpenses)
+      expenseuserdetails.update({
+          TotalExpense:totalExpenses
+      },{where:{
+          id:req.user.id
+      }}).then((user)=>{
+        console.log(resolve)
+       res.status(200).json({resolve,result})
+    }).catch((error)=>{
+          console.log(error)
+      })
+  })
 })
-.then((result)=>{
-    res.status(200).json({result})
-})
-.catch((error)=>{
-    console.log(error)
-})
-})
+
+// const totalExpenses=Number(user.TotalExpense)+req.body.Expenditure
+// const userupdated=await expenseuserdetails.update({
+//         TotalExpense:totalExpenses
+//     },{
+//         where:{
+//             id:req.user.id
+//         }       
+//     }
+//     )
+}
+)
+    
+
+    
+
 
 app.get('/user/buypremium',userauthentication,async(req,res)=>{
 try{
@@ -167,6 +195,7 @@ try{
             Name:req.body.Name,
             Email:req.body.Email,
             Password:hash
+
         
         })
     })
@@ -226,15 +255,15 @@ app.get('/premiumuser/leaderboard',async(req,res)=>{
     try{
 
     const leaderboardusers=await expenseuserdetails.findAll({
-        attributes:['Name','id',[sequelize.fn('SUM',sequelize.col('userexpenses.Expenditure')),'totalcost']],
-        include:[
-            {
-             model:userexpense,
-             attributes:[]
-            }
-        ],
-        group:['expenseuserdetails.id'],
-        order:[['totalcost','DESC']]
+        // attributes:['Name','id',[sequelize.fn('SUM',sequelize.col('userexpenses.Expenditure')),'totalcost']],
+        // include:[
+        //     {
+        //      model:userexpense,
+        //      attributes:[]
+        //     }
+        // ],
+        // group:['expenseuserdetails.id'],
+        order:[['TotalExpense','DESC']]
     })
 
     res.status(200).json(leaderboardusers)
@@ -250,12 +279,11 @@ expenseuserdetails.hasMany(userexpense)
 userexpense.belongsTo(expenseuserdetails)
 expenseuserdetails.hasMany(ordercreated)
 ordercreated.belongsTo(expenseuserdetails)
-
-
 expenseuserdetails.sync().then((result)=>{
     userexpense.sync().then((result)=>{
          ordercreated.sync().then((result)=>{
-           app.listen(3000);
+            app.listen(3000);
+           
         }).catch((error)=>{
             console.log(error)
          })

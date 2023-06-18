@@ -20,7 +20,11 @@ const expenseuserdetails=sequelize.define('Expenseuserdetails',{
         type:Sequelize.STRING,
         allowNull:false,
        },
-       ispremiumuser:Sequelize.BOOLEAN
+       ispremiumuser:Sequelize.BOOLEAN,
+       TotalExpense:{
+          type:Sequelize.INTEGER,
+          defaultValue:0,
+       }
     });
  module.exports=expenseuserdetails;
   
