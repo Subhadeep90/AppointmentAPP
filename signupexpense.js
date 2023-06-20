@@ -15,6 +15,7 @@ const Razorpay=require('razorpay')
 const bcrypt=require('bcrypt')
 const jwt= require('jsonwebtoken');
 const sequelize = require('./util/database');
+const { Transaction } = require('sequelize');
 //const { where, expenseuserdetails } = require('expenseuserdetails');
 //const { generateKeyPair } = require('crypto');
 //const { expenseuserdetailsMethod } = require('expenseuserdetails/types/utils');
@@ -25,24 +26,35 @@ function generateAccessToken(id,ispremiumuser)
 app.use(bodyparser.json({extended:false}));
 
 
-app.delete('/user/expense/deleteexpense/:id',userauthentication,(req,res)=>{
+app.delete('/user/expense/deleteexpense/:id',userauthentication,async(req,res)=>{
+const t=await sequelize.transaction();
+console.log(req.body.Expense)
+    try{
     
-    userexpense.destroy({where:{
+
+    const expense=await userexpense.destroy({
+        where:{
         ExpenseuserdetailId:req.user.id,
         id:req.params.id
 
+    },transaction:t
+}) 
+     const totalExpenses=Number(req.user.TotalExpense)-Number(req.body.Expense)
+     const updateUpdatedetails=await expenseuserdetails.update(
+        {TotalExpense:totalExpenses}
+    ,{
+        where:{id:req.user.id},
+        transaction:t
+    });
+    (await t).commit()
+   
+    res.status(200).json({updateUpdatedetails}) 
     }
-    })
-    .then((result)=>{
-        console.log(result)
-        if(result==0)
-        {
-            res.status(400).json({message:"User Authentication failed"})
-        }
-    })
-    .catch((error)=>{
+    catch(error){
      console.log(error)
-    })
+     (await t).rollback();
+res.status(400).json({message:"User Authentication failed"})
+    }
 })
 app.get('/user/expense/getexpense',userauthentication,(req,res)=>{
  userexpense.findAll({
@@ -57,36 +69,41 @@ app.get('/user/expense/getexpense',userauthentication,(req,res)=>{
      console.log(error)
  })
 })
-
-
-app.post('/user/expense/addexpense',userauthentication,(req,res)=>{
-
-    const expense=userexpense.create({
+app.post('/user/expense/addexpense',userauthentication,async(req,res)=>{
+     const t=await sequelize.transaction();
+try{
+    await userexpense.create({
     Expenditure:req.body.Expenditure,
     Description:req.body.Description,
     Category:req.body.Category,
     ExpenseuserdetailId:req.user.id
 
-}).then((result)=>{
-  expenseuserdetails.findAll({
-      where:{
-          id:req.user.id
-      }
-  }).then((resolve)=>{
-      const totalExpenses=Number(resolve[0].dataValues.TotalExpense) +Number(req.body.Expenditure)
-      console.log(totalExpenses)
-      expenseuserdetails.update({
-          TotalExpense:totalExpenses
-      },{where:{
-          id:req.user.id
-      }}).then((user)=>{
-        console.log(resolve)
-       res.status(200).json({resolve,result})
-    }).catch((error)=>{
-          console.log(error)
-      })
-  })
+},{ transaction:t
 })
+
+
+  
+const totalExpenses=Number(req.user.TotalExpense) +Number(req.body.Expenditure)
+
+      console.log(totalExpenses)
+ const updateUpdatedetails=await expenseuserdetails.update(
+     {TotalExpense:totalExpenses}
+ ,{
+     where:{id:req.user.id},
+     transaction:t
+ });
+ (await t).commit()
+
+ res.status(200).json({updateUpdatedetails}) 
+}
+  
+
+catch(error){
+(await t).rollback();
+    console.log(error)
+    res.status(400).json({message:"User Authentication failed"})
+
+}
 
 // const totalExpenses=Number(user.TotalExpense)+req.body.Expenditure
 // const userupdated=await expenseuserdetails.update({
@@ -274,7 +291,6 @@ catch(error)
     console.log(error)
 }
 })
-
 expenseuserdetails.hasMany(userexpense)
 userexpense.belongsTo(expenseuserdetails)
 expenseuserdetails.hasMany(ordercreated)

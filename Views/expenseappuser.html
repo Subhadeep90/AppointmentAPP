@@ -62,12 +62,14 @@ h4{
  {
    const ListOftems=document.getElementById('ListOftems')
    const li=document.createElement('li')
-   li.append(obj.Expenditure,"----",obj.Description,"----",obj.Category)
+   li.append(obj.Expenditure),li.append("----"),li.append(obj.Description),li.append("----"),li.append(obj.Category)
    const deletebutton=document.createElement('button')
    deletebutton.innerText="Delete"; 
    deletebutton.onclick=(e)=>{
-   deleteitems(obj)
    const litoremove=e.target.parentElement
+   const ExpensetoRemove=litoremove.childNodes[0].data
+   deleteitems(obj,ExpensetoRemove)
+
    ListOftems.removeChild(litoremove);
    }
    
@@ -97,6 +99,7 @@ h4{
      }
     axios.get("http://localhost:3000/user/expense/getexpense",{headers:{"Authentication":token}})
      .then((result)=>{
+         console.log(result)
          for(var i=0;i<result.data.result.length;i++)
          {   
 
@@ -110,10 +113,11 @@ h4{
     }
 
 
- function deleteitems(obj)
+ function deleteitems(obj,e)
  {
-    const token=localStorage.getItem('token')
-    axios.delete(`http://localhost:3000/user/expense/deleteexpense/${obj.id}`,{headers:{"Authentication":token}})
+const token=localStorage.getItem('token')
+    
+    axios.delete(`http://localhost:3000/user/expense/deleteexpense/${obj.id}`,{headers:{"Authentication":token},data:{Expense:e}})
      .then((result)=>{
       console.log(result)
  })
