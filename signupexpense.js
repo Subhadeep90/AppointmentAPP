@@ -9,6 +9,7 @@ const { AsyncResource } = require('async_hooks');
 const expenseuserdetails=require('./Model/expenselogin');
 const userexpense=require('./Model/expenseuser');
 const ordercreated=require('./Model/order');
+const SIB=require('sib-api-v3-sdk')
 
 const userauthentication=require('./middleware/auth')
 const Razorpay=require('razorpay')
@@ -16,6 +17,7 @@ const bcrypt=require('bcrypt')
 const jwt= require('jsonwebtoken');
 const sequelize = require('./util/database');
 const { Transaction } = require('sequelize');
+const { getMaxListeners } = require('process');
 //const { where, expenseuserdetails } = require('expenseuserdetails');
 //const { generateKeyPair } = require('crypto');
 //const { expenseuserdetailsMethod } = require('expenseuserdetails/types/utils');
@@ -290,6 +292,39 @@ catch(error)
 {
     console.log(error)
 }
+})
+app.use('/user/password/forgotpassword',(req,res)=>{
+    console.log(req.body)
+    if(req.body.mailid=="")
+    {  
+       res.status(405).json({message:'Please Enter mailid' })
+    }
+    else{
+        const client=SIB.ApiClient.instance
+const apiKey=client.authentications['api-key']
+apiKey.apiKey=process.env.Api_key
+const tranEmailApi=new SIB.TransactionalEmailsApi()
+const sender={
+    email:'subhadeepmitra1990@gmail.com'
+}
+const receivers=[
+    {
+        email:req.body.mailid
+    }
+]
+tranEmailApi.sendTransacEmail({
+sender,
+to:receivers,
+subject:'Your Passwrd',
+textContent:'sm@gmail.com'
+})
+    .then((resolve)=>{
+    console.log(resolve)
+}).catch((error)=>{
+    console.log(error)
+})
+    res.status(200).json({message:'Submitted Successfully'})
+    }
 })
 expenseuserdetails.hasMany(userexpense)
 userexpense.belongsTo(expenseuserdetails)
