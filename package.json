@@ -24,7 +24,8 @@
     "jsonwebtoken": "^9.0.0",
     "nodemon": "^2.0.22",
     "razorpay": "^2.8.6",
-    "sib-api-v3-sdk": "^8.5.0"
+    "sib-api-v3-sdk": "^8.5.0",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "body-parser": "^1.20.2",

@@ -10,7 +10,7 @@ const expenseuserdetails=require('./Model/expenselogin');
 const userexpense=require('./Model/expenseuser');
 const ordercreated=require('./Model/order');
 const SIB=require('sib-api-v3-sdk')
-
+const forgotpasswordrequest=require('./Model/passwordrequestable')
 const userauthentication=require('./middleware/auth')
 const Razorpay=require('razorpay')
 const bcrypt=require('bcrypt')
@@ -18,6 +18,8 @@ const jwt= require('jsonwebtoken');
 const sequelize = require('./util/database');
 const { Transaction } = require('sequelize');
 const { getMaxListeners } = require('process');
+const passwordrequest = require('./Model/passwordrequestable');
+const uuid=require('uuid');
 //const { where, expenseuserdetails } = require('expenseuserdetails');
 //const { generateKeyPair } = require('crypto');
 //const { expenseuserdetailsMethod } = require('expenseuserdetails/types/utils');
@@ -293,6 +295,57 @@ catch(error)
     console.log(error)
 }
 })
+app.get('/updatepassword/:id',async(req,res)=>{
+    try{
+        const id=req.params.id
+        const updatedPassword=req.query.updatedpassword
+        const saltrounds=10;
+    const hash= await bcrypt.hash(updatedPassword,saltrounds)
+    const userupdate=await forgotpasswordrequest.findOne({
+        where:{
+            id:id
+        }
+    })
+    console.log(id)
+     await forgotpasswordrequest.update({
+         isActive:false
+     },{
+         where:{
+             id:id
+         }
+     })
+     await expenseuserdetails.update({
+         Password:hash
+     },{
+         where:{
+             id:userupdate.dataValues.userId
+         }
+     })
+     res.status(200).send('Password updated successfully') 
+    }
+    catch(error)
+    {
+        console.log(error)
+        res.status(400).json({message:'Something went wrong'})
+    }
+    })
+
+app.use('/password/resetpassword/:id',(req,res)=>{
+const id=req.params.id;
+forgotpasswordrequest.findOne({
+    where:{
+        id:req.params.id
+    }
+}).then((result)=>{
+ if(result && result.dataValues.isActive==true)
+ {
+   res.status(200).send(`<form method="GET" action="/updatepassword/${id}">New Password<input type="password" name="updatedpassword" id="mailid"><button type="submit" id="submit">Reset Password</button</form>`)
+ }
+}).catch((error)=>{
+    console.log(error)
+})
+})
+
 app.use('/user/password/forgotpassword',(req,res)=>{
     console.log(req.body)
     if(req.body.mailid=="")
@@ -312,28 +365,60 @@ const receivers=[
         email:req.body.mailid
     }
 ]
+const newid=uuid.v4()
+expenseuserdetails.findOne({
+    where:{
+        email:req.body.mailid
+    }
+}).then((user)=>{
+    const userID=user.dataValues.id
+
+   if(!user)
+   {
+       res.status(400).json({message:'No such user'})
+   }
+else{
+    forgotpasswordrequest.create({
+        id:newid,
+        isActive:true,
+        userId:userID
+    
+    }).then((result)=>{
+        console.log(result)
+    }).catch((error)=>{
+        console.log(error)
+    })
+}
+}).catch((error)=>{
+   console.log(error)
+})
+
 tranEmailApi.sendTransacEmail({
 sender,
 to:receivers,
-subject:'Your Passwrd',
-textContent:'sm@gmail.com'
+subject:'Your Password reset link',
+textContent:`http://localhost:3000/password/resetpassword/${newid}`
 })
     .then((resolve)=>{
     console.log(resolve)
 }).catch((error)=>{
     console.log(error)
 })
-    res.status(200).json({message:'Submitted Successfully'})
+    res.status(200).json({message:'Please click on the link sent in your mail to reset password'})
     }
 })
 expenseuserdetails.hasMany(userexpense)
 userexpense.belongsTo(expenseuserdetails)
 expenseuserdetails.hasMany(ordercreated)
 ordercreated.belongsTo(expenseuserdetails)
+expenseuserdetails.hasMany(forgotpasswordrequest)
+forgotpasswordrequest.belongsTo(expenseuserdetails)
 expenseuserdetails.sync().then((result)=>{
     userexpense.sync().then((result)=>{
          ordercreated.sync().then((result)=>{
-            app.listen(3000);
+         forgotpasswordrequest.sync().then((result)=>{
+             app.listen(3000)
+         })
            
         }).catch((error)=>{
             console.log(error)
