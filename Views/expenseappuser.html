@@ -142,7 +142,47 @@ const token=localStorage.getItem('token')
                 button.onclick=(e)=>{
                     showleaderboard(e)
                 }
-                h3.append(" ",button)
+                const button1=document.createElement('button');
+                button1.innerText="Download"
+                button1.onclick=()=>{
+                    const token=localStorage.getItem('token')
+
+                    axios.get("http://localhost:3000/user/premiumuser/download",{headers:{"Authentication":token}}).then((result)=>{
+                    if(result.status==200)
+                    {
+                        var a=document.createElement("a");
+                      a.href=result.data.fileUrl;
+                      a.download='myexpense.csv'
+                      a.click();  
+                    }
+                    
+                      
+                    }).catch((error)=>{
+                        console.log(error)
+                    })
+
+                }
+                const button2=document.createElement('button');
+                    button2.innerText="Show list of files downloaded";
+                    button2.onclick=()=>{
+                        const token=localStorage.getItem('token')
+                        axios.get('http://localhost:3000/user/premiumuser/download/listoffiles',{headers:{"Authentication":token}}).then((result)=>{
+                            console.log(result.data.data)
+
+                            for(var i=0;i<result.data.data.length;i++)
+                            {  
+                                const li=document.createElement('li')
+
+                                li.append("Your file----->",result.data.data[i].FileUrl," ","Date----->",result.data.data[i].createdAt)
+                                document.body.append(li)
+
+                            }
+                            
+                        }).catch((error)=>{
+                            console.log(error)
+                        })
+                    }
+                h3.append(" ",button," ",button1," ",button2)
                 document.body.append(h3)
 
  }
