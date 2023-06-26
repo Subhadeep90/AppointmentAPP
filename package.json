@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Subhadeep90/AppointmentAPP#readme",
   "dependencies": {
+    "aws-sdk": "^2.1404.0",
     "bcrypt": "^5.1.0",
     "dotenv": "^16.1.4",
     "i": "^0.3.7",
