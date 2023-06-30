@@ -23,6 +23,11 @@ h4{
      <option>Electricity</option>
      <option>Movie</option>
  </select>
+ Number of rows per page<select>
+    <Option>2</Option>
+    <Option>3</Option>
+    <Option>4</Option>
+</select>
  <button type="submit" id="submitbutton">Add Expense</button>
 </form>
 <h3>Expenses</h3>
@@ -37,6 +42,7 @@ h4{
 
 </body>
 <script>
+
  const submitbutton=document.getElementById('submitbutton')
  submitbutton.addEventListener('click',additems)
  function additems(e)
@@ -87,25 +93,30 @@ h4{
 }
 
  
- 
- window.addEventListener('DOMContentLoaded',fetchDetails)
- function fetchDetails()
- {
-     const token=localStorage.getItem('token')
-     const decodedToken=parseJwt(token);
-     if(decodedToken.ispremiumuser==true)
+ window.addEventListener('DOMContentLoaded',()=>{
+    const token=localStorage.getItem('token')
+    const decodedToken=parseJwt(token);
+    if(decodedToken.ispremiumuser==true)
      {
         showpremiumuser()
      }
-    axios.get("http://localhost:3000/user/expense/getexpense",{headers:{"Authentication":token}})
+
+    })
+window.addEventListener('DOMContentLoaded',fetchDetails)
+ function fetchDetails()
+ {
+    let page=1
+    const token=localStorage.getItem('token')
+    axios.get(`http://localhost:3000/user/expense/getexpense/${page}`,{headers:{"Authentication":token}})
      .then((result)=>{
-         console.log(result)
+    
+          
          for(var i=0;i<result.data.result.length;i++)
          {   
-
              showOnscreen(result.data.result[i])
          }
-     })
+         pagination(result.data.pagedetails)
+        })
      .catch((error)=>{
          console.log(error)
      })
@@ -113,6 +124,42 @@ h4{
     }
 
 
+    function  pagination(pagedetails)
+
+{
+    const ButtonOne=document.createElement('button')
+       const currentPage=pagedetails.currentPage
+       let page=currentPage
+       ButtonOne.innerText=currentPage
+       ButtonOne.addEventListener('click',()=>fetchDetails(currentPage))
+       document.body.appendChild(ButtonOne)
+
+console.log(pagedetails)
+ if(pagedetails.previousPage==0 ) 
+ {
+
+   const ButtonTwo=document.createElement('button')
+   const nextPage=pagedetails.nextPage
+   let page=nextPage
+   console.log(nextPage)
+   ButtonTwo.innerText="2"
+   ButtonTwo.type="submit"
+   ButtonTwo.addEventListener('click',()=>fetchDetails(nextPage))
+   document.body.appendChild(ButtonTwo)  
+   console.log(ButtonTwo)
+ }
+ else
+ {
+     let page=1
+ }
+ return page
+
+   }
+
+
+
+ 
+    
  function deleteitems(obj,e)
  {
 const token=localStorage.getItem('token')
@@ -277,5 +324,8 @@ const token=localStorage.getItem('token')
         console.log(error)
     })
  }
+
+ 
 </script>
+
 </html>
