@@ -64,10 +64,18 @@ console.log(req.body.Expense)
 res.status(400).json({message:"User Authentication failed"})
     }
 })
-app.get('/user/expense/getexpense/:pageno',userauthentication,(req,res)=>{
+app.get('/user/expense/getexpense',userauthentication,(req,res)=>{
     const Item_per_page=2;
-    let page=Number(req.params.pageno)
+    console.log(req.query)
+    let page=Number(req.query.page)
     userexpense.findAll({
+      where:{ExpenseuserdetailId:req.user.id}  
+    }).then((expense)=>{
+       let totalItems;
+        totalItems=expense.length
+
+
+    return userexpense.findAll({
      where:{
         ExpenseuserdetailId:req.user.id
 
@@ -76,11 +84,13 @@ app.get('/user/expense/getexpense/:pageno',userauthentication,(req,res)=>{
      limit:Item_per_page
     })
  .then((result)=>{
-     res.status(200).json({result,pagedetails:{previousPage:page-1,currentPage:page,nextPage:page+1}})
+     res.status(200).json({result,
+         previousPage:page-1,currentPage:page,nextPage:page+1,hasNextPage:Item_per_page*page<totalItems,hasPreviousPage:page>1,lastPage:Math.ceil(totalItems/Item_per_page)})
  })
  .catch((error)=>{
      console.log(error)
  })
+})
 })
 app.post('/user/expense/addexpense',userauthentication,async(req,res)=>{
      const t=await sequelize.transaction();

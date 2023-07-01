@@ -38,7 +38,11 @@ h4{
 
 
 <h3 id="h3"></h3>
+<!-- <button id="ButtonOne">1</button>
+<button id="ButtonTwo">2</button>
+<button id="ButtonThree">3</button> -->
 
+<h3 id="Pagination"></h3>
 
 </body>
 <script>
@@ -100,22 +104,32 @@ h4{
      {
         showpremiumuser()
      }
-
+     axios.get("http://localhost:3000/user/expense/getexpense",
+    {params:{page:1},headers:{"Authentication":token}})
+     .then((result)=>{
+         console.log(result)
+        for(var i=0;i<result.data.result.length;i++)
+         {   
+             showOnscreen(result.data.result[i])
+         }
+         pagination(result.data)
+    }).catch((error)=>{
+        console.log(error)
     })
-window.addEventListener('DOMContentLoaded',fetchDetails)
- function fetchDetails()
+ })
+ function fetchDetails(page)
  {
-    let page=1
     const token=localStorage.getItem('token')
-    axios.get(`http://localhost:3000/user/expense/getexpense/${page}`,{headers:{"Authentication":token}})
+    axios.get("http://localhost:3000/user/expense/getexpense",
+    {params:{page:page},headers:{"Authentication":token}})
      .then((result)=>{
     
-          
+          console.log(result)
          for(var i=0;i<result.data.result.length;i++)
          {   
              showOnscreen(result.data.result[i])
          }
-         pagination(result.data.pagedetails)
+         pagination(result.data)
         })
      .catch((error)=>{
          console.log(error)
@@ -123,41 +137,46 @@ window.addEventListener('DOMContentLoaded',fetchDetails)
      
     }
 
-
-    function  pagination(pagedetails)
-
+const Pagination=document.getElementById('Pagination')
+  
+function pagination({
+ previousPage,
+currentPage,
+ hasNextPage,
+ hasPreviousPage,
+ lastPage,
+ nextPage
+})
 {
-    const ButtonOne=document.createElement('button')
-       const currentPage=pagedetails.currentPage
-       let page=currentPage
-       ButtonOne.innerText=currentPage
-       ButtonOne.addEventListener('click',()=>fetchDetails(currentPage))
-       document.body.appendChild(ButtonOne)
 
-console.log(pagedetails)
- if(pagedetails.previousPage==0 ) 
+ if(hasPreviousPage) 
  {
-
    const ButtonTwo=document.createElement('button')
-   const nextPage=pagedetails.nextPage
-   let page=nextPage
-   console.log(nextPage)
-   ButtonTwo.innerText="2"
-   ButtonTwo.type="submit"
-   ButtonTwo.addEventListener('click',()=>fetchDetails(nextPage))
-   document.body.appendChild(ButtonTwo)  
-   console.log(ButtonTwo)
+   ButtonTwo.innerHTML=`<h3>${previousPage}<h3>`
+   ButtonTwo.addEventListener('click',()=>fetchDetails(previousPage))
+   Pagination.appendChild(ButtonTwo)
+   console.log(Pagination)
+   
  }
- else
+
+ const ButtonOne=document.createElement('button')
+   ButtonOne.innerHTML=`<h3>${currentPage}</h3>`
+   ButtonOne.addEventListener('click',()=>fetchDetails(currentPage))
+   Pagination.appendChild(ButtonOne)  
+   console.log(Pagination)
+
+   if(hasNextPage) 
  {
-     let page=1
- }
- return page
 
-   }
+   const ButtonThree=document.createElement('button')
+
+   ButtonThree.innerHTML=nextPage
+   ButtonThree.addEventListener('click',()=>fetchDetails(nextPage))
+   Pagination.appendChild(ButtonThree)
+};
 
 
-
+}
  
     
  function deleteitems(obj,e)
