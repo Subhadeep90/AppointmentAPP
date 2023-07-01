@@ -22,14 +22,21 @@ h4{
      <option>Food</option>
      <option>Electricity</option>
      <option>Movie</option>
- </select>
- Number of rows per page<select>
-    <Option>2</Option>
-    <Option>3</Option>
-    <Option>4</Option>
-</select>
+     </select>
  <button type="submit" id="submitbutton">Add Expense</button>
 </form>
+<br>
+<br>
+<br>
+<form>
+    Number of rows per page<select id="nor">
+        <Option>2</Option>
+        <Option>3</Option>
+        <Option>4</Option>
+     </select>
+    <button id="norsubmit"type="submit">Apply</button>
+</form>
+
 <h3>Expenses</h3>
 <ul id="ListOftems"></ul>
 <button type="submit"id="razorpay">Buy Premium Membership</ul>
@@ -42,12 +49,27 @@ h4{
 <button id="ButtonTwo">2</button>
 <button id="ButtonThree">3</button> -->
 
-<h3 id="Pagination"></h3>
+<Pagination id="Pagination"></Pagination>
 
 </body>
 <script>
+const norsubmit=document.getElementById('norsubmit');
+ norsubmit.addEventListener('click',nortoSubmit)
+function nortoSubmit(e)
+{
+    e.preventDefault();
+    const nor=Number(document.getElementById('nor').value)
+    axios.post("http://localhost:3000/user/expense/dynamicpagination",{nor:nor})
+    .then((result)=>{
+        console.log(result)
+        localStorage.setItem('nor',result.data.norNumber)
+    }).catch((err)=>{
+        console.log(err)
+    })
 
- const submitbutton=document.getElementById('submitbutton')
+}
+
+const submitbutton=document.getElementById('submitbutton')
  submitbutton.addEventListener('click',additems)
  function additems(e)
  {
@@ -55,7 +77,8 @@ h4{
     const obj={
       Expenditure:document.getElementById('amount').value,
       Description:document.getElementById('Description').value,
-      Category:document.getElementById('category').value
+      Category:document.getElementById('category').value,
+
      }
      const token=localStorage.getItem('token')
      axios.post("http://localhost:3000/user/expense/addexpense",obj,{headers:{"Authentication":token}})
@@ -70,10 +93,15 @@ h4{
  }
  function showOnscreen(obj)
  {
-   const ListOftems=document.getElementById('ListOftems')
-   const li=document.createElement('li')
-   li.append(obj.Expenditure),li.append("----"),li.append(obj.Description),li.append("----"),li.append(obj.Category)
-   const deletebutton=document.createElement('button')
+    const ListOftems=document.getElementById('ListOftems')
+
+   for(var i=0;i<obj.length;i++)
+   {
+
+    const li=document.createElement('li')
+    li.id="li"
+    li.append(obj[i].Expenditure),li.append("----"),li.append(obj[i].Description),li.append("----"),li.append(obj[i].Category)
+    const deletebutton=document.createElement('button')
    deletebutton.innerText="Delete"; 
    deletebutton.onclick=(e)=>{
    const litoremove=e.target.parentElement
@@ -82,10 +110,20 @@ h4{
 
    ListOftems.removeChild(litoremove);
    }
-   
    li.append(deletebutton);
    ListOftems.append(li);
+
+   }
+   
+
  }
+ function removeListofitems()
+   {
+       const li=document.getElementById('li')
+
+       const ListOftems=document.getElementById('ListOftems')
+       ListOftems.innerHTML=""
+    }
  function parseJwt (token) {
     var base64Url = token.split('.')[1];
     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -99,36 +137,34 @@ h4{
  
  window.addEventListener('DOMContentLoaded',()=>{
     const token=localStorage.getItem('token')
+    const nor=localStorage.getItem('nor')
     const decodedToken=parseJwt(token);
     if(decodedToken.ispremiumuser==true)
      {
         showpremiumuser()
      }
      axios.get("http://localhost:3000/user/expense/getexpense",
-    {params:{page:1},headers:{"Authentication":token}})
+    {params:{page:1,nor:nor},headers:{"Authentication":token}})
      .then((result)=>{
-         console.log(result)
-        for(var i=0;i<result.data.result.length;i++)
-         {   
-             showOnscreen(result.data.result[i])
-         }
+         console.log(result)  
+             showOnscreen(result.data.result)
+
          pagination(result.data)
     }).catch((error)=>{
         console.log(error)
     })
  })
- function fetchDetails(page)
+
+ function fetchDetails(page,nor)
  {
     const token=localStorage.getItem('token')
     axios.get("http://localhost:3000/user/expense/getexpense",
-    {params:{page:page},headers:{"Authentication":token}})
+    {params:{page:page,nor:nor},headers:{"Authentication":token}})
      .then((result)=>{
     
-          console.log(result)
-         for(var i=0;i<result.data.result.length;i++)
-         {   
-             showOnscreen(result.data.result[i])
-         }
+          console.log(result)  
+             showOnscreen(result.data.result)
+
          pagination(result.data)
         })
      .catch((error)=>{
@@ -138,7 +174,6 @@ h4{
     }
 
 const Pagination=document.getElementById('Pagination')
-  
 function pagination({
  previousPage,
 currentPage,
@@ -148,22 +183,52 @@ currentPage,
  nextPage
 })
 {
-
- if(hasPreviousPage) 
+Pagination.innerHTML='';
+const nor=localStorage.getItem('nor')
+console.log(nor)
+    if(hasPreviousPage) 
  {
-   const ButtonTwo=document.createElement('button')
-   ButtonTwo.innerHTML=`<h3>${previousPage}<h3>`
-   ButtonTwo.addEventListener('click',()=>fetchDetails(previousPage))
-   Pagination.appendChild(ButtonTwo)
-   console.log(Pagination)
+
+       const ButtonTwo=document.createElement('button')
+       ButtonTwo.innerHTML=previousPage
+
+       ButtonTwo.addEventListener('click',()=>{
+        removeListofitems()  
+
+        fetchDetails(previousPage,nor)
+
+
+
+
+       })
+       Pagination.appendChild(ButtonTwo)
+       
+    
+
    
  }
-
+ 
  const ButtonOne=document.createElement('button')
    ButtonOne.innerHTML=`<h3>${currentPage}</h3>`
-   ButtonOne.addEventListener('click',()=>fetchDetails(currentPage))
-   Pagination.appendChild(ButtonOne)  
-   console.log(Pagination)
+   ButtonOne.addEventListener('click',()=>{
+    fetchDetails(currentPage,nor)
+    removeListofitems()  
+
+})
+   Pagination.appendChild(ButtonOne)
+
+ 
+// if(hasPreviousPage && hasNextPage)
+// {
+//     const ButtonOne=document.createElement('button')
+//    ButtonOne.innerHTML=`<h3>${currentPage}</h3>`
+//    ButtonOne.addEventListener('click',()=>fetchDetails(currentPage))
+//    document.body.appendChild(ButtonOne)
+//    const ButtonTwo=document.createElement('button')
+//    ButtonTwo.innerHTML=`<h3>${currentPage}</h3>`
+//    ButtonTwo.addEventListener('click',()=>fetchDetails(currentPage))
+//    document.body.appendChild(ButtonTwo)
+// }
 
    if(hasNextPage) 
  {
@@ -171,13 +236,18 @@ currentPage,
    const ButtonThree=document.createElement('button')
 
    ButtonThree.innerHTML=nextPage
-   ButtonThree.addEventListener('click',()=>fetchDetails(nextPage))
+   ButtonThree.addEventListener('click',()=>{
+       fetchDetails(nextPage,nor)
+       removeListofitems()  
+
+   })
    Pagination.appendChild(ButtonThree)
+
 };
-
-
+document.body.appendChild(Pagination)
 }
- 
+
+
     
  function deleteitems(obj,e)
  {

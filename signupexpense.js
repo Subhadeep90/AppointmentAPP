@@ -3,6 +3,7 @@ const cors=require('cors');
 const express=require('express');
 const app=express();
 const path=require('path');
+const fs=require('fs')
 app.use(cors());
 const bodyparser=require('body-parser'); 
 const { AsyncResource } = require('async_hooks');
@@ -12,6 +13,8 @@ const ordercreated=require('./Model/order');
 const SIB=require('sib-api-v3-sdk')
 const forgotpasswordrequest=require('./Model/passwordrequestable')
 const UploadedContent=require('./Model/UploadedContent')
+const helmet=require('helmet')
+const morgan=require('morgan')
 
 const userauthentication=require('./middleware/auth')
 const Razorpay=require('razorpay')
@@ -31,7 +34,12 @@ function generateAccessToken(id,ispremiumuser)
 {
     return jwt.sign({userid:id,ispremiumuser},process.env.Token_key)
 }
+const accesslog=fs.createWriteStream(path.join(__dirname,'access.log'),{
+    flags:'a'
+});
 app.use(bodyparser.json({extended:false}));
+app.use(helmet());
+app.use(morgan('combined',{stream:accesslog}));
 
 
 app.delete('/user/expense/deleteexpense/:id',userauthentication,async(req,res)=>{
@@ -65,7 +73,8 @@ res.status(400).json({message:"User Authentication failed"})
     }
 })
 app.get('/user/expense/getexpense',userauthentication,(req,res)=>{
-    const Item_per_page=2;
+    const Item_per_page=Number(req.query.nor);
+    console.log(Item_per_page)
     console.log(req.query)
     let page=Number(req.query.page)
     userexpense.findAll({
@@ -91,6 +100,10 @@ app.get('/user/expense/getexpense',userauthentication,(req,res)=>{
      console.log(error)
  })
 })
+})
+app.post('/user/expense/dynamicpagination',(req,res)=>{
+    const norNumber=req.body.nor
+    res.status(200).json({message:'successful',norNumber:norNumber})
 })
 app.post('/user/expense/addexpense',userauthentication,async(req,res)=>{
      const t=await sequelize.transaction();
@@ -228,7 +241,7 @@ if(req.body.Name==""||req.body.Email==""||req.body.Password=="")
 else{
 try{
     const Passwordtaken=req.body.Password;
-    const saltrounds=10;
+    const saltrounds=process.env.SALTROUNDS;
     bcrypt.hash(Passwordtaken,saltrounds,async(error,hash)=>{
         console.log(error)
         await expenseuserdetails.create({
@@ -320,7 +333,7 @@ app.get('/updatepassword/:id',async(req,res)=>{
     try{
         const id=req.params.id
         const updatedPassword=req.query.updatedpassword
-        const saltrounds=10;
+        const saltrounds=process.env.SALTROUNDS;
     const hash= await bcrypt.hash(updatedPassword,saltrounds)
     const userupdate=await forgotpasswordrequest.findOne({
         where:{
@@ -368,9 +381,9 @@ forgotpasswordrequest.findOne({
 })
 function uploadToS3(data,filename)
 {
-  const BUCKET_NAME='expensetrackiapp12';
-  const IAM_USER_KEY='AKIA2JIIUFBJ2HEKZDHR';
-  const IAM_USER_SECRET='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';
+  const BUCKET_NAME=process.env.BUCKET_Name;
+  const IAM_USER_KEY=process.env.IAM_User_Key;
+  const IAM_USER_SECRET=process.env.IAM_Secret_Key;
   let s3Bucket= new AWS.S3({
       accessKeyId:IAM_USER_KEY,
       secretAccessKey:IAM_USER_SECRET
@@ -448,7 +461,7 @@ const apiKey=client.authentications['api-key']
 apiKey.apiKey=process.env.Api_key
 const tranEmailApi=new SIB.TransactionalEmailsApi()
 const sender={
-    email:'subhadeepmitra1990@gmail.com'
+    email:process.env.EMAILID
 }
 const receivers=[
     {
@@ -509,7 +522,7 @@ expenseuserdetails.sync().then((result)=>{
          ordercreated.sync().then((result)=>{
          forgotpasswordrequest.sync().then((result)=>{
              UploadedContent.sync().then((result)=>{
-                app.listen(3000)
+                app.listen(process.env.PORT)
 
              })
          })
