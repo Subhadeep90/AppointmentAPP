@@ -54,9 +54,11 @@ Enter your name:<input type="text" id="Name"required></input></br></br>
          h4.remove()  
         },2000)
         document.body.append(h4);
+        window.location.href="file:///E:/sharpener/Node%20js/AppointmentAPP/Views/expenseappuserloginpage.html"
 
     })
     .catch((error)=>{
+        console.log(error)
         const h4=document.createElement('h4')
 
         h4.append(error.response.data.message)
@@ -66,7 +68,6 @@ Enter your name:<input type="text" id="Name"required></input></br></br>
         document.body.append(h4);
 
     })
- window.location.href="file:///E:/sharpener/Node%20js/AppointmentAPP/Views/expenseappuserloginpage.html"
  }
 </script>
 </body>
