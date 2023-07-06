@@ -48,10 +48,9 @@ h4{
 <!-- <button id="ButtonOne">1</button>
 <button id="ButtonTwo">2</button>
 <button id="ButtonThree">3</button> -->
-
 <Pagination id="Pagination"></Pagination>
 
-</body>
+
 <script>
 const norsubmit=document.getElementById('norsubmit');
  norsubmit.addEventListener('click',nortoSubmit)
@@ -63,6 +62,8 @@ function nortoSubmit(e)
     .then((result)=>{
         console.log(result)
         localStorage.setItem('nor',result.data.norNumber)
+        location.reload();
+       console.log(nor)
     }).catch((err)=>{
         console.log(err)
     })
@@ -83,10 +84,31 @@ const submitbutton=document.getElementById('submitbutton')
      const token=localStorage.getItem('token')
      axios.post("http://localhost:3000/user/expense/addexpense",obj,{headers:{"Authentication":token}})
      .then((result)=>{
-        console.log(result)
-       showOnscreen(result.data.result)
+       const ExpenseUser=result.data.ExpenseOfUser
+        const ListOftems=document.getElementById('ListOftems')
+   
+       const li=document.createElement('li')
 
-     })
+li.id="li"
+li.append(ExpenseUser.Expenditure),li.append("----"),li.append(ExpenseUser.Description),li.append("----"),li.append(ExpenseUser.Category)
+const deletebutton=document.createElement('button')
+deletebutton.innerText="Delete";
+deletebutton.onclick=(e)=>{
+const litoremove=e.target.parentElement
+const ExpensetoRemove=litoremove.childNodes[0].data
+deleteitems(ExpenseUser,ExpensetoRemove)
+
+
+
+
+ListOftems.removeChild(litoremove);
+}
+li.append(deletebutton);
+ListOftems.append(li);
+
+})
+
+    
      .catch((error)=>{
          console.log(error)
      })
@@ -94,29 +116,36 @@ const submitbutton=document.getElementById('submitbutton')
  function showOnscreen(obj)
  {
     const ListOftems=document.getElementById('ListOftems')
-
-   for(var i=0;i<obj.length;i++)
-   {
-
-    const li=document.createElement('li')
-    li.id="li"
-    li.append(obj[i].Expenditure),li.append("----"),li.append(obj[i].Description),li.append("----"),li.append(obj[i].Category)
-    const deletebutton=document.createElement('button')
-   deletebutton.innerText="Delete"; 
-   deletebutton.onclick=(e)=>{
-   const litoremove=e.target.parentElement
-   const ExpensetoRemove=litoremove.childNodes[0].data
-   deleteitems(obj,ExpensetoRemove)
-
-   ListOftems.removeChild(litoremove);
-   }
-   li.append(deletebutton);
-   ListOftems.append(li);
-
-   }
+   obj.forEach(element => {
    
+       const li=document.createElement('li')
 
- }
+li.id="li"
+li.append(element.Expenditure),li.append("----"),li.append(element.Description),li.append("----"),li.append(element.Category)
+const deletebutton=document.createElement('button')
+deletebutton.innerText="Delete";
+deletebutton.onclick=(e)=>{
+const litoremove=e.target.parentElement
+const ExpensetoRemove=litoremove.childNodes[0].data
+deleteitems(element,ExpensetoRemove)
+
+
+
+
+ListOftems.removeChild(litoremove);
+}
+li.append(deletebutton);
+ListOftems.append(li);
+
+});
+
+   
+    }
+    
+
+   
+   
+ 
  function removeListofitems()
    {
        const li=document.getElementById('li')
@@ -146,10 +175,9 @@ const submitbutton=document.getElementById('submitbutton')
      axios.get("http://localhost:3000/user/expense/getexpense",
     {params:{page:1,nor:nor},headers:{"Authentication":token}})
      .then((result)=>{
-         console.log(result)  
              showOnscreen(result.data.result)
-
-         pagination(result.data)
+       
+        pagination(result.data)
     }).catch((error)=>{
         console.log(error)
     })
@@ -162,7 +190,6 @@ const submitbutton=document.getElementById('submitbutton')
     {params:{page:page,nor:nor},headers:{"Authentication":token}})
      .then((result)=>{
     
-          console.log(result)  
              showOnscreen(result.data.result)
 
          pagination(result.data)
@@ -185,8 +212,8 @@ currentPage,
 {
 Pagination.innerHTML='';
 const nor=localStorage.getItem('nor')
-console.log(nor)
-    if(hasPreviousPage) 
+document.getElementById('nor').value=nor;
+if(hasPreviousPage) 
  {
 
        const ButtonTwo=document.createElement('button')
@@ -252,7 +279,6 @@ document.body.appendChild(Pagination)
  function deleteitems(obj,e)
  {
 const token=localStorage.getItem('token')
-    
     axios.delete(`http://localhost:3000/user/expense/deleteexpense/${obj.id}`,{headers:{"Authentication":token},data:{Expense:e}})
      .then((result)=>{
       console.log(result)
