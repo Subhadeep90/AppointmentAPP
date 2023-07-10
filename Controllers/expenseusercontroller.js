@@ -10,7 +10,7 @@ const Razorpay=require('razorpay')
 
 const expenseuserdetails=require('../Model/expenselogin');
 const userexpense=require('../Model/expenseuser');
-const bcrypt=require('bcrypt')
+const bcrypt=require('bcryptjs')
 const jwt= require('jsonwebtoken');
 const ordercreated=require('../Model/order');
 

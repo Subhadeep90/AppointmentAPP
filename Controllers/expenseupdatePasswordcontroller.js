@@ -8,7 +8,7 @@ const userauthentication=require('../middleware/auth')
 const express=require('express');
 const uuid=require('uuid');
 const AWS=require('aws-sdk');
-const bcrypt=require('bcrypt')
+const bcrypt=require('bcryptjs')
 
 const getupdatepassword=async(req,res)=>{ 
     try{
