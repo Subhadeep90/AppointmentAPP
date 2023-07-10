@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Login Page</title>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <style>
     form{
@@ -28,86 +28,93 @@
 </head>
 
 <body>
+
  <form id="formitem">
  Email:<input type="email" id="email" required></br></br>
  Password:<input type="password" id="password" required></br></br>
  <button id="Login">Log in</button></br></br>
- <a href="file:///E:/sharpener/Node%20js/AppointmentAPP/Views/SignUP%20Page.html">New user sign Up now</a>
+ <a href="./signuppage.html">New user sign Up now</a>
 
 </form>
+
 <br>
 <br>
 <button id="forgotpassword">Forgot Password</button>
 <br>
 <br>
-</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
 <script>
 const loginButton=document.getElementById('Login');
-const formitem=document.getElementById('formitem');
-
-
-
-let postrequest=(e)=>
-
-{
-    const obj={
-    Email:document.getElementById('email').value,
-    Password:document.getElementById('password').value
-
-}
-    e.preventDefault();
-    axios.post("http://localhost:3000/user/Login",obj)
-    .then((result)=>{
-    if(result.status==200)
-    {
-    console.log(result)
-    alert(result.data.message)
-    localStorage.setItem('token',result.data.token)
-    window.location.href="file:///E:/sharpener/Node%20js/AppointmentAPP/Views/expenseappuser.html"
-   }
+    const formitem=document.getElementById('formitem');
     
-    })
-    .catch((error)=>{
-    const h4=document.createElement('h4')
-    h4.append(error.response.data.message);
-    setTimeout(() => {
-   h4.remove()    
-}, 2000);
-document.body.append(h4)
+    
+    
+    let postrequest=(e)=>
+    
+    {
 
-    })
-}
-loginButton.addEventListener('click',postrequest)
-const forgotPassword=document.getElementById('forgotpassword')
-forgotPassword.addEventListener('click',forgotpassword)
-function forgotpassword(e)
-{
-  e.preventDefault()
-  const form=document.createElement('form')
-  const mailid=document.createElement('input')
-  const button=document.createElement('button')
-  button.type="submit"
-  button.innerText="Submit"
-  mailid.type="text";
-  mailid.placeholder="Please enter email id"
-  mailid.id="mailid"
-  button.onclick=(e)=>{
+        const obj={
+        Email:document.getElementById('email').value,
+        Password:document.getElementById('password').value
+    
+    }
+        e.preventDefault();
+        axios.post("http://54.197.28.237:3000/user/Login",obj, )
+
+    
+        .then((result)=>{
+        if(result.status==200)
+        {
+        alert(result.data.message)
+        localStorage.setItem('token',result.data.token)
+        window.location.href="./expenseappuser.html"
+       }
+        
+        })
+        .catch((error)=>{
+        const h4=document.createElement('h4')
+        h4.append(error.response.data.message);
+        setTimeout(() => {
+       h4.remove()    
+    }, 2000);
+    document.body.append(h4)
+    
+        })
+    }
+    loginButton.addEventListener('click',postrequest)
+    const forgotPassword=document.getElementById('forgotpassword')
+    forgotPassword.addEventListener('click',forgotpassword)
+    function forgotpassword(e)
+    {
       e.preventDefault()
-      const mailid=document.getElementById('mailid').value
-      const obj={
-       mailid:mailid
+      const form=document.createElement('form')
+      const mailid=document.createElement('input')
+      const button=document.createElement('button')
+      button.type="submit"
+      button.innerText="Submit"
+      mailid.type="text";
+      mailid.placeholder="Please enter email id"
+      mailid.id="mailid"
+      button.onclick=(e)=>{
+          e.preventDefault()
+          const mailid=document.getElementById('mailid').value
+          const obj={
+           mailid:mailid
+          }
+          axios.post("http://54.197.28.237:3000/user/password/forgotpassword",obj).then((result)=>{
+              console.log(result.data.message)
+              document.body.append(`${result.data.message}`);
+          }).catch((err)=>{
+              console.log(err)
+          })
       }
-      axios.post("http://localhost:3000/user/password/forgotpassword",obj).then((result)=>{
-          console.log(result.data.message)
-          document.body.append(`${result.data.message}`);
-      }).catch((err)=>{
-          console.log(err)
-      })
-  }
-  
-  form.append(mailid,button)
-  document.body.append(form) 
-}
-
+      
+      form.append(mailid,button)
+      document.body.append(form) 
+    }
+    
 </script>
+
+</body>
 </html>

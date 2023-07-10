@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign UP</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<style>
+ form{
+     text-align: center;
+     color:blue   
+ }
+
+ h2{
+     text-align: center;
+ }
+ h4{
+    color:red 
+ }
+</style>
+
+</head>
+<body>
+<nav>
+
+</nav>
+<heading>
+    <h2>Sign up</h2>
+</heading>
+<form>
+Enter your name:<input type="text" id="Name"required></input></br></br>
+ Enter your email:<input type="email" id="Email"required></input></br></br>
+ Enter a strong Password:<input type="password" id="Password" required></input></br></br>
+ <button id="button">Signup</button></br>
+</form> 
+<script>
+ const button=document.getElementById('button');
+ button.addEventListener('click',submituserdetails)
+ function submituserdetails(e)
+ { obj={
+     Name:document.getElementById('Name').value,
+     Email:document.getElementById('Email').value,
+     Password:document.getElementById('Password').value
+ }
+     e.preventDefault();
+     const h4=document.getElementById('h4');
+    axios.post("http://54.197.28.237:3000/user/Signup",obj)
+    .then((result)=>{
+        console.log(result);
+        const h4=document.createElement('h4')
+        h4.append(result.data)
+        setTimeout(()=>{
+         h4.remove()  
+        },2000)
+        document.body.append(h4); 
+
+    })
+    .catch((error)=>{
+        console.log(error)
+        const h4=document.createElement('h4')
+
+        h4.append(error.response.data.message)
+        setTimeout(()=>{
+         h4.remove()  
+        },2000)
+        document.body.append(h4);
+
+    })
+    window.location.href="./expenseappuserloginpage.html"
+
+ }
+</script>
+</body>
+</html>

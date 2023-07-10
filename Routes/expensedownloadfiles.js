@@ -5,8 +5,8 @@ const express=require('express');
 const router=express.Router()
 const expenseDownloadfileController=require('../Controllers/expensedownloadfilecontroller')
 
-router.get('/user/premiumuser/download/listoffiles',userauthentication,expenseDownloadfileController.DownloadListoffiles)
+router.get('/download/listoffiles',userauthentication,expenseDownloadfileController.DownloadListoffiles)
 
 
-router.get('/user/premiumuser/download',userauthentication,expenseDownloadfileController.getDownload)
+router.get('/download',userauthentication,expenseDownloadfileController.getDownload)
 module.exports=router;

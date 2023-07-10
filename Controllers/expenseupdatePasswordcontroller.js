@@ -1,8 +1,8 @@
 const sequelize = require('../util/database');
 const forgotpasswordrequest=require('../Model/passwordrequestable')
-require('dotenv').config();
 const SIB=require('sib-api-v3-sdk')
 const expenseuserdetails=require('../Model/expenselogin');
+require('dotenv').config();
 
 const userauthentication=require('../middleware/auth')
 const express=require('express');
@@ -36,7 +36,8 @@ const getupdatepassword=async(req,res)=>{
              id:userupdate.dataValues.userId
          }
      })
-     res.status(200).send('Password updated successfully') 
+     res.status(200).json({message:'Password Updated Successfully'})
+
     }
     catch(error)
     {
@@ -111,14 +112,15 @@ tranEmailApi.sendTransacEmail({
 sender,
 to:receivers,
 subject:'Your Password reset link',
-textContent:`http://localhost:3000/password/resetpassword/${newid}`
+textContent:`http://54.197.28.237:3000/password/resetpassword/${newid}`
 })
     .then((resolve)=>{
     console.log(resolve)
+    res.status(200).json({message:'Please click on the link sent in your mail to reset password'})
+
 }).catch((error)=>{
     console.log(error)
 })
-    res.status(200).json({message:'Please click on the link sent in your mail to reset password'})
     }
 }
 

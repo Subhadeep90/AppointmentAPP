@@ -4,7 +4,6 @@ const express=require('express');
 const app=express();
 const path=require('path');
 const fs=require('fs')
-app.use(cors());
 const bodyparser=require('body-parser'); 
 const { AsyncResource } = require('async_hooks');
 const expenseuserdetails=require('./Model/expenselogin');
@@ -15,11 +14,13 @@ const forgotpasswordrequest=require('./Model/passwordrequestable')
 const UploadedContent=require('./Model/UploadedContent')
 const helmet=require('helmet')
 const morgan=require('morgan')
+
 const userrouter=require('./Routes/expenseuserroutes')
 const purchaseroutes=require('./Routes/expensepurchaseroutes')
 const updatepasswordroutes=require('./Routes/expenseupdatepassword')
 const downloadfilesroutes=require('./Routes/expensedownloadfiles')
 
+app.use(cors())  
 
 
 const sequelize = require('./util/database');
@@ -32,21 +33,26 @@ const accesslog=fs.createWriteStream(path.join(__dirname,'access.log'),{
     flags:'a'
 });
 app.use(bodyparser.json({extended:false}));
-app.use(helmet());
+//app.use(helmet());
 app.use(morgan('combined',{stream:accesslog}));
 
-
-app.use(userrouter)
+app.use('/user',userrouter)
 app.use(purchaseroutes)
 app.use(updatepasswordroutes)
-app.use(downloadfilesroutes)
+app.use('/user/premiumuser',downloadfilesroutes)
 
+// app.use((req,res)=>{
+// console.log(req.url)
+// console.log(__dirname)
+// res.sendFile(path.join(__dirname,`Views/${req.url}`))
+  
+// })  
+   
 
-
-
-    
-
-app.use(updatepasswordroutes)
+//app.use(updatepasswordroutes)
+app.use((req,res)=>{
+   res.sendFile(path.join(__dirname,`Views/${req.url}`))
+})
 
 expenseuserdetails.hasMany(userexpense)
 userexpense.belongsTo(expenseuserdetails)
