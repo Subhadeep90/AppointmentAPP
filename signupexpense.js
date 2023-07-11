@@ -51,7 +51,8 @@ app.use('/user/premiumuser',downloadfilesroutes)
 
 //app.use(updatepasswordroutes)
 app.use((req,res)=>{
-   res.sendFile(path.join(__dirname,`Views/${req.url}`))
+    console.log("request");
+    res.sendFile(path.join(__dirname,`Views/${req.url}`))
 })
 
 expenseuserdetails.hasMany(userexpense)
