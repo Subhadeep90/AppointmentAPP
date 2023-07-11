@@ -112,7 +112,7 @@ tranEmailApi.sendTransacEmail({
 sender,
 to:receivers,
 subject:'Your Password reset link',
-textContent:`http://54.197.28.237:3000/password/resetpassword/${newid}`
+textContent:`http://34.227.163.254:3000/password/resetpassword/${newid}`
 })
     .then((resolve)=>{
     console.log(resolve)

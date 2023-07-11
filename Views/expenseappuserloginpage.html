@@ -60,7 +60,7 @@ const loginButton=document.getElementById('Login');
     
     }
         e.preventDefault();
-        axios.post("http://54.197.28.237:3000/user/Login",obj, )
+        axios.post("http://34.227.163.254:3000/user/Login",obj, )
 
     
         .then((result)=>{
@@ -102,7 +102,7 @@ const loginButton=document.getElementById('Login');
           const obj={
            mailid:mailid
           }
-          axios.post("http://54.197.28.237:3000/user/password/forgotpassword",obj).then((result)=>{
+          axios.post("http://34.227.163.254:3000/user/password/forgotpassword",obj).then((result)=>{
               console.log(result.data.message)
               document.body.append(`${result.data.message}`);
           }).catch((err)=>{

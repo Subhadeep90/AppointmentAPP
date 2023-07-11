@@ -58,7 +58,7 @@ function nortoSubmit(e)
 {
     e.preventDefault();
     const nor=Number(document.getElementById('nor').value)
-    axios.post("http://54.197.28.237:3000/user/expense/dynamicpagination",{nor:nor})
+    axios.post("http://34.227.163.254:3000/user/expense/dynamicpagination",{nor:nor})
     .then((result)=>{
         console.log(result)
         localStorage.setItem('nor',result.data.norNumber)
@@ -82,7 +82,7 @@ const submitbutton=document.getElementById('submitbutton')
 
      }
      const token=localStorage.getItem('token')
-     axios.post("http://54.197.28.237:3000/user/expense/addexpense",obj,{headers:{"Authentication":token}})
+     axios.post("http://34.227.163.254:3000/user/expense/addexpense",obj,{headers:{"Authentication":token}})
      .then((result)=>{
        const ExpenseUser=result.data.ExpenseOfUser
         const ListOftems=document.getElementById('ListOftems')
@@ -172,7 +172,7 @@ ListOftems.append(li);
      {
         showpremiumuser()
      }
-     axios.get("http://54.197.28.237:3000/user/expense/getexpense",
+     axios.get("http://34.227.163.254:3000/user/expense/getexpense",
     {params:{page:1,nor:nor},headers:{"Authentication":token}})
      .then((result)=>{
              showOnscreen(result.data.result)
@@ -185,7 +185,7 @@ ListOftems.append(li);
  function fetchDetails(page,nor)
  {
     const token=localStorage.getItem('token')
-    axios.get("http://54.197.28.237:3000/user/expense/getexpense",
+    axios.get("http://34.227.163.254:3000/user/expense/getexpense",
     {params:{page:page,nor:nor},headers:{"Authentication":token}})
      .then((result)=>{
     
@@ -278,7 +278,7 @@ document.body.appendChild(Pagination)
  function deleteitems(obj,e)
  {
 const token=localStorage.getItem('token')
-    axios.delete(`http://54.197.28.237:3000/user/expense/deleteexpense/${obj.id}`,{headers:{"Authentication":token},data:{Expense:e}})
+    axios.delete(`http://34.227.163.254:3000/user/expense/deleteexpense/${obj.id}`,{headers:{"Authentication":token},data:{Expense:e}})
      .then((result)=>{
       console.log(result)
  })
@@ -308,7 +308,7 @@ const token=localStorage.getItem('token')
                 button1.onclick=()=>{
                     const token=localStorage.getItem('token')
 
-                    axios.get("http://54.197.28.237:3000/user/premiumuser/download",{headers:{"Authentication":token}}).then((result)=>{
+                    axios.get("http://34.227.163.254:3000/user/premiumuser/download",{headers:{"Authentication":token}}).then((result)=>{
                     if(result.status==200)
                     {
                         var a=document.createElement("a");
@@ -327,7 +327,7 @@ const token=localStorage.getItem('token')
                     button2.innerText="Show list of files downloaded";
                     button2.onclick=()=>{
                         const token=localStorage.getItem('token')
-                        axios.get('http://54.197.28.237:3000/user/premiumuser/download/listoffiles',{headers:{"Authentication":token}}).then((result)=>{
+                        axios.get('http://34.227.163.254:3000/user/premiumuser/download/listoffiles',{headers:{"Authentication":token}}).then((result)=>{
                             console.log(result.data.data)
 
                             for(var i=0;i<result.data.data.length;i++)
@@ -350,7 +350,7 @@ const token=localStorage.getItem('token')
  function showleaderboard(e)
  {
     e.preventDefault() 
-    axios.get("http://54.197.28.237:3000/premiumuser/leaderboard")
+    axios.get("http://34.227.163.254:3000/premiumuser/leaderboard")
     .then((result)=>{
         console.log(result)
         const h3=document.createElement('h3')
@@ -393,7 +393,7 @@ const token=localStorage.getItem('token')
  {
     e.preventDefault()
     const token=localStorage.getItem('token') 
-    axios.get("http://54.197.28.237:3000/user/buypremium",{headers:{"Authentication":token}})
+    axios.get("http://34.227.163.254:3000/user/buypremium",{headers:{"Authentication":token}})
     .then((result)=>{
         console.log(result);
         let options={
@@ -404,7 +404,7 @@ const token=localStorage.getItem('token')
                 
                 alert('You are a Premium User Now');
                 showpremiumuser()
-                await axios.post("http://54.197.28.237:3000/purchase/updatetransactionstatus",{
+                await axios.post("http://34.227.163.254:3000/purchase/updatetransactionstatus",{
                 order_id:options.order_id,
                 payment_id:result.razorpay_payment_id,
                 },{headers:{"Authorization":token}}).then((result)=>{
@@ -419,7 +419,7 @@ const token=localStorage.getItem('token')
         
         razorpay.on('payment.failed',function(result){
             console.log(result.error)
-            axios.post("http://54.197.28.237:3000/purchase/updatetransactionstatus",{
+            axios.post("http://34.227.163.254:3000/purchase/updatetransactionstatus",{
                 order_id:result.error.metadata.order_id,
                 payment_id:result.error.metadata.payment_id,
                 
