@@ -51,7 +51,6 @@ app.use('/user/premiumuser',downloadfilesroutes)
 
 //app.use(updatepasswordroutes)
 app.use((req,res)=>{
-    console.log(req.url);
    res.sendFile(path.join(__dirname,`Views/${req.url}`))
 })
 
