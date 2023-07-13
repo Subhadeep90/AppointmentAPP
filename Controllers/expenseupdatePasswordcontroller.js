@@ -88,8 +88,9 @@ expenseuserdetails.findOne({
 }).then((user)=>{
     const userID=user.dataValues.id
 
-   if(!user)
+   if(user.dataValues==null)
    {
+       console.log(user)
        res.status(400).json({message:'No such user'})
    }
 else{
@@ -100,27 +101,33 @@ else{
     
     }).then((result)=>{
         console.log(result)
+        tranEmailApi.sendTransacEmail({
+            sender,
+            to:receivers,
+            subject:'Your Password reset link',
+            textContent:`http://35.173.135.203:3000/password/resetpassword/${newid}`
+            })
+                .then((resolve)=>{
+                console.log(resolve)
+                res.status(200).json({message:'Please click on the link sent in your mail to reset password'})
+            
+            }).catch((error)=>{
+                console.log(error)
+                res.status(405).json({message:'Something went wrong'})
+            })
     }).catch((error)=>{
         console.log(error)
+        res.status(405).json({message:'Something went wrong'})
+
     })
 }
 }).catch((error)=>{
    console.log(error)
+   res.status(405).json({message:'No such user'})
+
 })
 
-tranEmailApi.sendTransacEmail({
-sender,
-to:receivers,
-subject:'Your Password reset link',
-textContent:`http://54.161.203.137:3000/password/resetpassword/${newid}`
-})
-    .then((resolve)=>{
-    console.log(resolve)
-    res.status(200).json({message:'Please click on the link sent in your mail to reset password'})
 
-}).catch((error)=>{
-    console.log(error)
-})
     }
 }
 

@@ -45,19 +45,18 @@ Enter your name:<input type="text" id="Name"required></input></br></br>
  }
      e.preventDefault();
      const h4=document.getElementById('h4');
-    axios.post("http://54.161.203.137:3000/user/Signup",obj)
+    axios.post("http://35.173.135.203:3000/user/Signup",obj)
     .then((result)=>{
-        console.log(result);
-        const h4=document.createElement('h4')
-        h4.append(result.data)
-        setTimeout(()=>{
-         h4.remove()  
-        },2000)
-        document.body.append(h4); 
+    
+    if(result.status==200)
+    {
+    window.location.href="./expenseappuserloginpage.html"
+    }
 
+    
     })
+    
     .catch((error)=>{
-        console.log(error)
         const h4=document.createElement('h4')
 
         h4.append(error.response.data.message)
@@ -67,7 +66,6 @@ Enter your name:<input type="text" id="Name"required></input></br></br>
         document.body.append(h4);
 
     })
-    window.location.href="./expenseappuserloginpage.html"
 
  }
 </script>

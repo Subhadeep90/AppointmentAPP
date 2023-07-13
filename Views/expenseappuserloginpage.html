@@ -60,7 +60,7 @@ const loginButton=document.getElementById('Login');
     
     }
         e.preventDefault();
-        axios.post("http://54.161.203.137:3000/user/Login",obj, )
+        axios.post("http://35.173.135.203:3000/user/Login",obj, )
 
     
         .then((result)=>{
@@ -102,11 +102,21 @@ const loginButton=document.getElementById('Login');
           const obj={
            mailid:mailid
           }
-          axios.post("http://54.161.203.137:3000/user/password/forgotpassword",obj).then((result)=>{
+          axios.post("http://35.173.135.203:3000/user/password/forgotpassword",obj).then((result)=>{
               console.log(result.data.message)
               document.body.append(`${result.data.message}`);
           }).catch((err)=>{
               console.log(err)
+              const  h5=document.createElement('h5')
+              h5.style.color="red"
+              h5.append(`${err.response.data.message}`);
+              document.body.append(h5)
+
+              setTimeout(()=>{
+                h5.remove   (`${err.response.data.message}`);
+
+              },5000)
+
           })
       }
       
