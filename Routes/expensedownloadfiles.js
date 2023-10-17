@@ -1,4 +1,4 @@
-const sequelize = require('../util/database');
+// const sequelize = require('../util/database');
 
 const userauthentication=require('../middleware/auth')
 const express=require('express');
